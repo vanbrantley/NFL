@@ -18,6 +18,7 @@ try:
     # Commit the changes
     db.session.commit()
 
+    # Log success
     print("Teams inserted successfully ✅")
 
 except Exception as e:

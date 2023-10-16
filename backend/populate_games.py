@@ -56,6 +56,13 @@ month_to_number = {
     "December": "12"
 }
 
+html_classes = {
+    "games_table": "TableBaseWrapper",
+    "date_class": "TableBase-title",
+    "table-rows": "TableBase-bodyTr",
+    "team-name": "TeamName"
+}
+
 for week_number in range(1, REG_SEASON_WEEKS + 1):
 
     games = []
@@ -70,22 +77,36 @@ for week_number in range(1, REG_SEASON_WEEKS + 1):
     if response.status_code == 200:
 
         soup = BeautifulSoup(response.text, 'html.parser')
-        game_day_tables = soup.find_all('div', class_='TableBaseWrapper')
+
+        game_day_tables = soup.find_all('div', class_=html_classes["games_table"])
+        if not game_day_tables:
+            error_message = "Error: No game day tables found. Check the web page structure."
+            raise ValueError(error_message)
         
         for table in game_day_tables:
 
-            # get the date
-            date_string = table.find('h4', class_='TableBase-title').text.strip()
+            date_string = table.find('h4', class_=html_classes["date_class"]).text.strip()
+            if date_string is None:
+                error_message = "Error: Game date not found. Check the web page structure."
+                raise ValueError(error_message)
 
-            rows = table.find_all('tr', class_='TableBase-bodyTr')
+            rows = table.find_all('tr', class_=html_classes["table-rows"])
+            if rows is None:
+                error_message = "Error: No game rows found. Check the web page structure."
+                raise ValueError(error_message)
 
             for row in rows:
                 cells = row.find_all('td')
+
                 away_cell = cells[0]
                 home_cell = cells[1]
 
-                away_team_city = away_cell.find('span', class_='TeamName').text
-                home_team_city = home_cell.find('span', class_='TeamName').text
+                away_team_city = away_cell.find('span', class_=html_classes["team-name"]).text
+                home_team_city = home_cell.find('span', class_=html_classes["team-name"]).text
+
+                if away_team_city is None or home_team_city is None:
+                    error_message = "Error: Team cities not found for game. Check the web page structure."
+                    raise ValueError(error_message)
 
                 # convert them to team names
                 away_team_abbreviation = cbs_city_to_abbreviation[away_team_city]

@@ -1,5 +1,5 @@
 import sys
-from app import app, db, Team, Player, Game, PassingGameLog, RushingGameLog, ReceivingGameLog
+from app import app, db, Player, Game, PassingGameLog, RushingGameLog, ReceivingGameLog
 import requests
 from bs4 import BeautifulSoup
 
@@ -20,66 +20,56 @@ def main():
         print("Week number must be between 1 and 18.")
         return
 
-    # If all checks pass, you can proceed with your script logic here
     print(f"Fetching game logs for week {week_number}...")
 
-    # Create an application context
     app.app_context().push()
 
     def find_full_name(shortened_name, player_names_list):
-        # First, try to match the full name directly
+        # first try to match the full name directly
         for full_name in player_names_list:
             if full_name.startswith(shortened_name[0]) and full_name.endswith(shortened_name[2:]):
                 return full_name
 
-        # If the direct match failed, remove "Jr." and try again
+        # if the direct match failed, remove "Jr." and try again
         shortened_name = shortened_name.replace(" Jr.", "")
         for full_name in player_names_list:
             full_name = full_name.replace(" Jr.", "")
             if full_name.startswith(shortened_name[0]) and full_name.endswith(shortened_name[2:]):
                 return full_name
 
-        # If the "Jr." removal still didn't match, try comparing last names
+        # if "Jr." removal still didn't match, compare last names
         shortened_last_name = shortened_name.split(" ")[-1]
         for full_name in player_names_list:
             last_name = full_name.split(" ")[-1]
             if last_name == shortened_last_name:
                 return full_name
 
-        # If the shortened name is "C. Anderson," return "Robbie Chosen"
+        # if the shortened name is "C. Anderson," return "Robbie Chosen"
         if shortened_name == "C. Anderson":
             return "Robbie Chosen"
 
-        # If none of the above cases matched, return None
+        # if none of the above cases matched, return None
         return None
     
-
+    # HTML structure:
     # div with away team stats id= player-stats-away
     # div with home team stats id= player-stats-home
-
     # inside of each of those - have a div with class_= stats-ctr-container
     # inside of that there's class_= passing-ctr, rushing-ctr, receiving-ctr
-
     # each of those has a div class_= stats_rows
     # with a table inside class_= stats-table
 
     def get_passing_logs(container, isHome):
-        # Find the div with class 'stats-rows' inside 'home_team_rushing'
         stats_rows = container.find('div', class_='stats-rows')
 
-        # Find all 'tr' elements with class 'no-hover data-row'
         player_rows = stats_rows.find_all('tr', class_='no-hover data-row')
         # print(player_rows)
 
-        # Loop through each player's row and extract the data
         for player_row in player_rows:
-            # Find all 'td' elements within the player's row
             player_data = player_row.find_all('td')
 
-            # Use a list comprehension to select relevant 'td' elements
             relevant_tds = [td for td in player_data if td.get('class') in [['name-element'], ['number-element']]]
 
-            # Extract data from the relevant 'td' elements
             player_name = relevant_tds[0].get_text(strip=True)
             player_full_name = find_full_name(player_name, home_players_names if isHome else away_players_names)
             if player_full_name is None:
@@ -107,22 +97,16 @@ def main():
             passing_logs.append(passing_log)
 
     def get_rushing_logs(container, isHome):
-        # Find the div with class 'stats-rows' inside 'home_team_rushing'
         stats_rows = container.find('div', class_='stats-rows')
 
-        # Find all 'tr' elements with class 'no-hover data-row'
         player_rows = stats_rows.find_all('tr', class_='no-hover data-row')
         # print(player_rows)
 
-        # Loop through each player's row and extract the data
         for player_row in player_rows:
-            # Find all 'td' elements within the player's row
             player_data = player_row.find_all('td')
 
-            # Use a list comprehension to select relevant 'td' elements
             relevant_tds = [td for td in player_data if td.get('class') in [['name-element'], ['number-element']]]
 
-            # Extract data from the relevant 'td' elements
             player_name = relevant_tds[0].get_text(strip=True)
             player_full_name = find_full_name(player_name, home_players_names if isHome else away_players_names)
             if player_full_name is None:
@@ -146,22 +130,16 @@ def main():
             rushing_logs.append(rushing_log)
 
     def get_receiving_logs(container, isHome):
-        # Find the div with class 'stats-rows' inside 'home_team_rushing'
         stats_rows = container.find('div', class_='stats-rows')
 
-        # Find all 'tr' elements with class 'no-hover data-row'
         player_rows = stats_rows.find_all('tr', class_='no-hover data-row')
         # print(player_rows)
 
-        # Loop through each player's row and extract the data
         for player_row in player_rows:
-            # Find all 'td' elements within the player's row
             player_data = player_row.find_all('td')
 
-            # Use a list comprehension to select relevant 'td' elements
             relevant_tds = [td for td in player_data if td.get('class') in [['name-element'], ['number-element']]]
 
-            # Extract data from the relevant 'td' elements
             player_name = relevant_tds[0].get_text(strip=True)
             player_full_name = find_full_name(player_name, home_players_names if isHome else away_players_names)
             if player_full_name is None:
@@ -185,6 +163,10 @@ def main():
             )
 
             receiving_logs.append(receiving_log)
+
+    html_classes = {
+
+    }
 
     try:
 
@@ -220,11 +202,20 @@ def main():
 
                 home_team_stats_container = soup.find('div', id="player-stats-home")
                 away_team_stats_container = soup.find('div', id="player-stats-away")
+                if home_team_stats_container is None or away_team_stats_container is None:
+                    error_message = "Error: Stats container not found. Check the web page structure."
+                    raise ValueError(error_message)
 
                 home_team_stats = home_team_stats_container.find('div', class_='stats-ctr-container')
                 away_team_stats = away_team_stats_container.find('div', class_='stats-ctr-container')
+                if home_team_stats is None or away_team_stats is None:
+                    error_message = "Error: Stats inner container not found. Check the web page structure."
+                    raise ValueError(error_message)
 
                 home_team_passing = home_team_stats.find('div', class_='passing-ctr')
+                if home_team_passing is None:
+                    error_message = "Error: Home team passing stats not found. Check the web page structure."
+                    raise ValueError(error_message)
                 home_team_rushing = home_team_stats.find('div', class_='rushing-ctr')
                 home_team_receiving = home_team_stats.find('div', class_='receiving-ctr')
                 away_team_passing = away_team_stats.find('div', class_='passing-ctr')
