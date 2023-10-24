@@ -1,14 +1,16 @@
 import os
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from dotenv import load_dotenv
 
 load_dotenv()
-  
+
 # creating a Flask app
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 DB_USERNAME = os.getenv("DB_USERNAME")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
