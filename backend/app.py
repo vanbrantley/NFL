@@ -10,7 +10,7 @@ load_dotenv()
 
 # creating a Flask app
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app)
 
 DB_USERNAME = os.getenv("DB_USERNAME")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
@@ -161,6 +161,27 @@ def get_team_roster(team_abbreviation):
         })
 
     return jsonify(player_list)
+
+@app.route('/api/player/<int:player_id>', methods=['GET'])
+def get_player(player_id):
+    
+    player = Player.query.filter_by(player_id=player_id).first()
+
+    if player:
+        return jsonify({
+            'player_id': player.player_id,
+            'player_name': player.player_name,
+            'team_abbreviation': player.team_abbreviation,
+            'position': player.position,
+            'jersey_number': player.jersey_number,
+            'image_url': player.image_url,
+            'height': player.height,
+            'weight': player.weight,
+            'experience': player.experience,
+            'college': player.college
+        })
+    else:
+        return jsonify({'message': 'Player not found'}, 404)
   
 # driver function
 if __name__ == '__main__':
