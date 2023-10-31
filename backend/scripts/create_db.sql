@@ -21,7 +21,10 @@ CREATE TABLE teams(
     abbreviation VARCHAR(3) NOT NULL,
     conference VARCHAR(3) NOT NULL,
     division VARCHAR(10) NOT NULL,
-    bye INT NOT NULL
+    bye INT NOT NULL,
+    primary_color VARCHAR(7) NOT NULL,
+    secondary_color VARCHAR(7) NOT NULL,
+    tertiary_color VARCHAR(7) NULL
 );
 
 CREATE TABLE players(

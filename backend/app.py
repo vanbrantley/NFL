@@ -35,6 +35,9 @@ class Team(db.Model):
     conference = db.Column(db.String(3), nullable=False)
     division = db.Column(db.String(10), nullable=False)
     bye = db.Column(db.Integer, nullable=False)
+    primary_color = db.Column(db.String(7), nullable=False)
+    secondary_color = db.Column(db.String(7), nullable=False)
+    tertiary_color = db.Column(db.String(7), nullable=True)
 
     # relationships
     players = relationship('Player', back_populates='team')
