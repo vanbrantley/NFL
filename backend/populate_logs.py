@@ -1,28 +1,28 @@
-import sys
+import argparse
+import datetime
 from app import app, db, Player, Game, PassingGameLog, RushingGameLog, ReceivingGameLog
 import requests
 from bs4 import BeautifulSoup
 
 def main():
-    
-    # week number command line argument checks
-    if len(sys.argv) != 2:
-        print("Usage: python3 populate_logs.py <week_number>")
-        return
-
-    week_number = sys.argv[1]
-    if not week_number.isdigit():
-        print("Week number must be a positive integer between 1 and 18.")
-        return
-
-    week_number = int(week_number)
-    if week_number < 1 or week_number > 18:
-        print("Week number must be between 1 and 18.")
-        return
-
-    print(f"Fetching game logs for week {week_number}...")
 
     app.app_context().push()
+
+    def current_nfl_week(current_date):
+        season_start_date = datetime.date(2023, 9, 5)
+        days_passed = (current_date - season_start_date).days
+        nfl_week = (days_passed // 7) + 1
+        return nfl_week
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--nfl_week", type=int, help="Current NFL week")
+    args = parser.parse_args()
+
+    current_date = datetime.date.today()
+
+    current_week = args.nfl_week if args.nfl_week is not None else current_nfl_week(current_date)
+
+    weeks_to_populate = [current_week] if args.nfl_week is not None else list(range(1, current_week))
 
     def find_full_name(shortened_name, player_names_list):
         # first try to match the full name directly
@@ -164,90 +164,91 @@ def main():
 
             receiving_logs.append(receiving_log)
 
-    html_classes = {
+    # html_classes = {
 
-    }
+    # }
 
-    try:
+    for week in weeks_to_populate:
+        try:
 
-        rushing_logs = []
-        passing_logs = []
-        receiving_logs = []
+            print(f"Adding week {week} game logs...")
 
-        # fetch games for that week from the games table
-        games = Game.query.filter_by(week=week_number).all()
+            rushing_logs = []
+            passing_logs = []
+            receiving_logs = []
 
-        # loop through games
-        for game in games:
+            games = Game.query.filter_by(week=week).all()
 
-            game_id = game.game_id
-            home_team_abbreviation = game.home_team_abbreviation
-            away_team_abbreviation = game.away_team_abbreviation
-            box_score_url = game.box_score_url
+            # loop through games
+            for game in games:
 
-            home_players = Player.query.filter_by(team_abbreviation=home_team_abbreviation).all()
-            home_players_names = [player.player_name for player in home_players]
-            away_players = Player.query.filter_by(team_abbreviation=away_team_abbreviation).all()
-            away_players_names = [player.player_name for player in away_players]
+                game_id = game.game_id
+                home_team_abbreviation = game.home_team_abbreviation
+                away_team_abbreviation = game.away_team_abbreviation
+                box_score_url = game.box_score_url
 
-            # print(box_score_url)
+                home_players = Player.query.filter_by(team_abbreviation=home_team_abbreviation).all()
+                home_players_names = [player.player_name for player in home_players]
+                away_players = Player.query.filter_by(team_abbreviation=away_team_abbreviation).all()
+                away_players_names = [player.player_name for player in away_players]
 
-            response = requests.get(box_score_url)
+                # print(box_score_url)
 
-            if response.status_code == 200:
+                response = requests.get(box_score_url)
 
-                soup = BeautifulSoup(response.text, 'html.parser')
+                if response.status_code == 200:
 
-                print(f"Adding {away_team_abbreviation} @ {home_team_abbreviation} game logs...")
+                    soup = BeautifulSoup(response.text, 'html.parser')
 
-                home_team_stats_container = soup.find('div', id="player-stats-home")
-                away_team_stats_container = soup.find('div', id="player-stats-away")
-                if home_team_stats_container is None or away_team_stats_container is None:
-                    error_message = "Error: Stats container not found. Check the web page structure."
-                    raise ValueError(error_message)
+                    print(f"Adding {away_team_abbreviation} @ {home_team_abbreviation} game logs...")
 
-                home_team_stats = home_team_stats_container.find('div', class_='stats-ctr-container')
-                away_team_stats = away_team_stats_container.find('div', class_='stats-ctr-container')
-                if home_team_stats is None or away_team_stats is None:
-                    error_message = "Error: Stats inner container not found. Check the web page structure."
-                    raise ValueError(error_message)
+                    home_team_stats_container = soup.find('div', id="player-stats-home")
+                    away_team_stats_container = soup.find('div', id="player-stats-away")
+                    if home_team_stats_container is None or away_team_stats_container is None:
+                        error_message = "Error: Stats container not found. Check the web page structure."
+                        raise ValueError(error_message)
 
-                home_team_passing = home_team_stats.find('div', class_='passing-ctr')
-                if home_team_passing is None:
-                    error_message = "Error: Home team passing stats not found. Check the web page structure."
-                    raise ValueError(error_message)
-                home_team_rushing = home_team_stats.find('div', class_='rushing-ctr')
-                home_team_receiving = home_team_stats.find('div', class_='receiving-ctr')
-                away_team_passing = away_team_stats.find('div', class_='passing-ctr')
-                away_team_rushing = away_team_stats.find('div', class_='rushing-ctr')
-                away_team_receiving = away_team_stats.find('div', class_='receiving-ctr')
+                    home_team_stats = home_team_stats_container.find('div', class_='stats-ctr-container')
+                    away_team_stats = away_team_stats_container.find('div', class_='stats-ctr-container')
+                    if home_team_stats is None or away_team_stats is None:
+                        error_message = "Error: Stats inner container not found. Check the web page structure."
+                        raise ValueError(error_message)
 
-                # print(home_team_passing)
-                # print(home_team_rushing)
-                # print(home_team_receiving)
-                # print(away_team_passing)
-                # print(away_team_rushing)
-                # print(away_team_receiving)
+                    home_team_passing = home_team_stats.find('div', class_='passing-ctr')
+                    if home_team_passing is None:
+                        error_message = "Error: Home team passing stats not found. Check the web page structure."
+                        raise ValueError(error_message)
+                    home_team_rushing = home_team_stats.find('div', class_='rushing-ctr')
+                    home_team_receiving = home_team_stats.find('div', class_='receiving-ctr')
+                    away_team_passing = away_team_stats.find('div', class_='passing-ctr')
+                    away_team_rushing = away_team_stats.find('div', class_='rushing-ctr')
+                    away_team_receiving = away_team_stats.find('div', class_='receiving-ctr')
 
-                get_passing_logs(home_team_passing, True)
-                get_rushing_logs(home_team_rushing, True)
-                get_receiving_logs(home_team_receiving, True)
-                get_passing_logs(away_team_passing, False)
-                get_rushing_logs(away_team_rushing, False)
-                get_receiving_logs(away_team_receiving, False)
+                    # print(home_team_passing)
+                    # print(home_team_rushing)
+                    # print(home_team_receiving)
+                    # print(away_team_passing)
+                    # print(away_team_rushing)
+                    # print(away_team_receiving)
 
-            else:
-                print(f"Failed to retrieve data from {box_score_url}. Status code: {response.status_code}")
+                    get_passing_logs(home_team_passing, True)
+                    get_rushing_logs(home_team_rushing, True)
+                    get_receiving_logs(home_team_receiving, True)
+                    get_passing_logs(away_team_passing, False)
+                    get_rushing_logs(away_team_rushing, False)
+                    get_receiving_logs(away_team_receiving, False)
 
-        db.session.add_all(passing_logs)
-        db.session.add_all(rushing_logs)
-        db.session.add_all(receiving_logs)
-        db.session.commit()  # Commit once after adding all players
-        print(f"Successfully added week {week_number} logs ✅")
+                else:
+                    print(f"Failed to retrieve data from {box_score_url}. Status code: {response.status_code}")
 
-    except Exception as e:
-        print(f"Error inserting data: {str(e)}")
+            db.session.add_all(passing_logs)
+            db.session.add_all(rushing_logs)
+            db.session.add_all(receiving_logs)
+            db.session.commit()  # Commit once after adding all players
+            print(f"Successfully added week {week} game logs ✅")
 
+        except Exception as e:
+            print(f"Error inserting data for week {week}: {str(e)}")
 
 if __name__ == "__main__":
     main()
