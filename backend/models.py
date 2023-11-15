@@ -21,10 +21,10 @@ class Team(db.Model):
     # relationships
     players = relationship("Player", back_populates="team")
     home_games = relationship(
-        "Game", foreign_keys="Game.home_team_abbreviation", back_populates="home_team"
+        "Game", foreign_keys="Game.home_team_id", back_populates="home_team"
     )
     away_games = relationship(
-        "Game", foreign_keys="Game.away_team_abbreviation", back_populates="away_team"
+        "Game", foreign_keys="Game.away_team_id", back_populates="away_team"
     )
 
     def __repr__(self):
@@ -35,9 +35,7 @@ class Player(db.Model):
     __tablename__ = "players"
     player_id = db.Column(db.Integer, primary_key=True)
     player_name = db.Column(db.String(100), nullable=False)
-    team_abbreviation = db.Column(
-        db.String(3), db.ForeignKey("teams.abbreviation"), nullable=False
-    )
+    team_id = db.Column(db.Integer, db.ForeignKey("teams.team_id"), nullable=False)
     position = db.Column(db.String(3), nullable=False)
     jersey_number = db.Column(db.Integer, nullable=True)
     image_url = db.Column(db.String(100), nullable=True)
@@ -54,28 +52,26 @@ class Player(db.Model):
     receiving_game_logs = relationship("ReceivingGameLog", back_populates="player")
 
     def __repr__(self):
-        return f"<Team {self.player_name}>"
+        return f"<Player {self.player_name}>"
 
 
 class Game(db.Model):
     __tablename__ = "games"
     game_id = db.Column(db.Integer, primary_key=True)
-    home_team_abbreviation = db.Column(
-        db.String(3), db.ForeignKey("teams.abbreviation"), nullable=False
-    )
-    away_team_abbreviation = db.Column(
-        db.String(3), db.ForeignKey("teams.abbreviation"), nullable=False
-    )
+    home_team_id = db.Column(db.Integer, db.ForeignKey("teams.team_id"), nullable=False)
+    away_team_id = db.Column(db.Integer, db.ForeignKey("teams.team_id"), nullable=False)
     season = db.Column(db.Integer, nullable=False)
     week = db.Column(db.Integer, nullable=False)
     box_score_url = db.Column(db.String(100), nullable=False)
+    home_team_score = db.Column(db.Integer, nullable=True)
+    away_team_score = db.Column(db.Integer, nullable=True)
 
     # relationships
     home_team = relationship(
-        "Team", foreign_keys=[home_team_abbreviation], back_populates="home_games"
+        "Team", foreign_keys=[home_team_id], back_populates="home_games"
     )
     away_team = relationship(
-        "Team", foreign_keys=[away_team_abbreviation], back_populates="away_games"
+        "Team", foreign_keys=[away_team_id], back_populates="away_games"
     )
 
     passing_game_logs = relationship("PassingGameLog", back_populates="game")
@@ -90,8 +86,8 @@ class PassingGameLog(db.Model):
     __tablename__ = "passing_game_logs"
     passing_log_id = db.Column(db.Integer, primary_key=True)
     game_id = db.Column(db.Integer, db.ForeignKey("games.game_id"), nullable=False)
-    player_name = db.Column(
-        db.String(100), db.ForeignKey("players.player_name"), nullable=False
+    player_id = db.Column(
+        db.Integer, db.ForeignKey("players.player_id"), nullable=False
     )
     completions = db.Column(db.Integer, nullable=False)
     attempts = db.Column(db.Integer, nullable=False)
@@ -109,8 +105,8 @@ class RushingGameLog(db.Model):
     __tablename__ = "rushing_game_logs"
     rushing_log_id = db.Column(db.Integer, primary_key=True)
     game_id = db.Column(db.Integer, db.ForeignKey("games.game_id"), nullable=False)
-    player_name = db.Column(
-        db.String(100), db.ForeignKey("players.player_name"), nullable=False
+    player_id = db.Column(
+        db.Integer, db.ForeignKey("players.player_id"), nullable=False
     )
     carries = db.Column(db.Integer, nullable=False)
     yards = db.Column(db.Integer, nullable=False)
@@ -126,8 +122,8 @@ class ReceivingGameLog(db.Model):
     __tablename__ = "receiving_game_logs"
     receiving_log_id = db.Column(db.Integer, primary_key=True)
     game_id = db.Column(db.Integer, db.ForeignKey("games.game_id"), nullable=False)
-    player_name = db.Column(
-        db.String(100), db.ForeignKey("players.player_name"), nullable=False
+    player_id = db.Column(
+        db.Integer, db.ForeignKey("players.player_id"), nullable=False
     )
     targets = db.Column(db.Integer, nullable=False)
     receptions = db.Column(db.Integer, nullable=False)

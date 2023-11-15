@@ -30,7 +30,7 @@ CREATE TABLE teams(
 CREATE TABLE players(
     player_id INT AUTO_INCREMENT PRIMARY KEY,
     player_name VARCHAR(100) NOT NULL,
-    team_abbreviation VARCHAR(3) REFERENCES teams(abbreviation),
+    team_id INT REFERENCES teams(team_id),
     position VARCHAR(3) NOT NULL,
     jersey_number INT NULL,
     image_url VARCHAR(100) NULL,
@@ -42,17 +42,19 @@ CREATE TABLE players(
 
 CREATE TABLE games(
     game_id INT AUTO_INCREMENT PRIMARY KEY,
-    home_team_abbreviation VARCHAR(3) REFERENCES team(abbreviation),
-    away_team_abbreviation VARCHAR(3) REFERENCES team(abbreviation),
+    home_team_id INT REFERENCES team(team_id),
+    away_team_id INT REFERENCES team(team_id),
     season INT NOT NULL,
     week INT NOT NULL,
-    box_score_url VARCHAR(100) NOT NULL
+    box_score_url VARCHAR(100) NOT NULL,
+    home_team_score INT NULL,
+    away_team_score INT NULL
 );
 
 CREATE TABLE passing_game_logs(
     passing_log_id INT AUTO_INCREMENT PRIMARY KEY,
     game_id INT REFERENCES games(game_id),
-    player_name VARCHAR(100) REFERENCES players(player_name),
+    player_id INT REFERENCES players(player_id),
     completions INT NOT NULL,
     attempts INT NOT NULL,
     yards INT NOT NULL,
@@ -64,7 +66,7 @@ CREATE TABLE passing_game_logs(
 CREATE TABLE rushing_game_logs(
     rushing_log_id INT AUTO_INCREMENT PRIMARY KEY,
     game_id INT REFERENCES games(game_id),
-    player_name VARCHAR(100) REFERENCES players(player_name),
+    player_id INT REFERENCES players(player_id),
     carries INT NOT NULL,
     yards INT NOT NULL,
     touchdowns INT NOT NULL,
@@ -74,7 +76,7 @@ CREATE TABLE rushing_game_logs(
 CREATE TABLE receiving_game_logs(
     receiving_log_id INT AUTO_INCREMENT PRIMARY KEY,
     game_id INT REFERENCES games(game_id),
-    player_name VARCHAR(100) REFERENCES players(player_name),
+    player_id INT REFERENCES players(player_id),
     targets INT NOT NULL,
     receptions INT NOT NULL,
     yards INT NOT NULL,

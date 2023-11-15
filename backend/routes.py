@@ -1,7 +1,7 @@
 from flask import jsonify, request
 
 # from app import app
-from models import Game, Player, PassingGameLog, RushingGameLog, ReceivingGameLog
+from models import Game, Team, Player, PassingGameLog, RushingGameLog, ReceivingGameLog
 
 
 # @app.route("/", methods=["GET", "POST"])
@@ -12,16 +12,20 @@ def hello_world():
 
 # @app.route("/api/roster/<team_abbreviation>", methods=["GET"])
 def get_team_roster(team_abbreviation):
-    team_players = Player.query.filter_by(team_abbreviation=team_abbreviation).all()
+    # get team's id from the abbreviation
+    team = Team.query.filter_by(abbreviation=team_abbreviation).first()
+    team_id = team.team_id
+
+    team_players = Player.query.filter_by(team_id=team_id).all()
 
     # Convert the player objects to a list of dictionaries
-    player_list = []
+    results = []
     for player in team_players:
-        player_list.append(
+        results.append(
             {
                 "player_id": player.player_id,
                 "player_name": player.player_name,
-                "team_abbreviation": player.team_abbreviation,
+                "team_id": player.team_id,
                 "position": player.position,
                 "jersey_number": player.jersey_number,
                 "image_url": player.image_url,
@@ -32,7 +36,7 @@ def get_team_roster(team_abbreviation):
             }
         )
 
-    return jsonify(player_list)
+    return jsonify(results)
 
 
 # @app.route("/api/player/<int:player_id>", methods=["GET"])
@@ -44,7 +48,7 @@ def get_player(player_id):
             {
                 "player_id": player.player_id,
                 "player_name": player.player_name,
-                "team_abbreviation": player.team_abbreviation,
+                "team_id": player.team_id,
                 "position": player.position,
                 "jersey_number": player.jersey_number,
                 "image_url": player.image_url,
@@ -61,24 +65,27 @@ def get_player(player_id):
 # @app.route("/api/games", methods=["GET"])
 def get_games():
     games = Game.query.all()
-    game_list = []
+    results = []
     for game in games:
-        game_list.append(
+        results.append(
             {
                 "game_id": game.game_id,
-                "home_team_abbreviation": game.home_team_abbreviation,
-                "away_team_abbreviation": game.away_team_abbreviation,
+                "home_team_id": game.home_team_id,
+                "away_team_id": game.away_team_id,
+                "home_team_abbreviation": game.home_team.abbreviation,
+                "away_team_abbreviation": game.away_team.abbreviation,
                 "season": game.season,
                 "week": game.week,
                 "box_score_url": game.box_score_url,
             }
         )
 
-    return jsonify(game_list)
+    return jsonify(results)
 
 
 # @app.route("/api/game/logs/<int:game_id>", methods=["GET"])
 def get_game_logs(game_id):
+    game = Game.query.filter_by(game_id=game_id).first()
     passing_logs = PassingGameLog.query.filter_by(game_id=game_id).all()
     rushing_logs = RushingGameLog.query.filter_by(game_id=game_id).all()
     receiving_logs = ReceivingGameLog.query.filter_by(game_id=game_id).all()
@@ -86,7 +93,18 @@ def get_game_logs(game_id):
     passing_logs_list = []
     rushing_logs_list = []
     receiving_logs_list = []
+    result = {}
 
     # for log in passing_logs:
+
+    # what you want the result to look like
+    result = {
+        "passing": [
+            # info of a passing game log but with the players name
+            {}
+        ],
+        "rushing": [],
+        "receiving": [],
+    }
 
     return jsonify(passing_logs_list)

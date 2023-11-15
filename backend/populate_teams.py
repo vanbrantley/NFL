@@ -1,13 +1,13 @@
 import json
-from app import app, db, Team
+from app import app, db
+from models import Team
 
 # Create an application context
 app.app_context().push()
 
 try:
-
     # Load team data from the JSON file
-    with open('teams.json', 'r') as file:
+    with open("teams.json", "r") as file:
         teams_data = json.load(file)
 
     # Create Team objects and add them to the session
