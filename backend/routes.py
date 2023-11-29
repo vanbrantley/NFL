@@ -83,6 +83,67 @@ def get_games():
     return jsonify(results)
 
 
+def get_player_game_logs(player_id):
+    player = Player.query.filter_by(player_id=player_id).first()
+
+    if player:
+        results = []
+        position = player.position
+        if position == "QB":
+            passing_logs = PassingGameLog.query.filter_by(player_id=player_id).all()
+            for log in passing_logs:
+                results.append(
+                    {
+                        "passing_log_id": log.passing_log_id,
+                        "game_id": log.game_id,
+                        "player_id": log.player_id,
+                        "completions": log.completions,
+                        "attempts": log.attempts,
+                        "yards": log.yards,
+                        "touchdowns": log.touchdowns,
+                        "interceptions": log.interceptions,
+                        "fantasy_points": log.fantasy_points,
+                    }
+                )
+            return results
+        elif position == "RB":
+            rushing_logs = RushingGameLog.query.filter_by(player_id=player_id).all()
+            for log in rushing_logs:
+                results.append(
+                    {
+                        "rushing_log_id": log.rushing_log_id,
+                        "game_id": log.game_id,
+                        "player_id": log.player_id,
+                        "carries": log.carries,
+                        "yards": log.yards,
+                        "touchdowns": log.touchdowns,
+                        "fantasy_points": log.fantasy_points,
+                    }
+                )
+            return results
+        elif position == "WR":
+            receiving_logs = ReceivingGameLog.query.filter_by(player_id=player_id).all()
+            for log in receiving_logs:
+                results.append(
+                    {
+                        "receiving_log_id": log.receiving_log_id,
+                        "game_id": log.game_id,
+                        "player_id": log.player_id,
+                        "targets": log.targets,
+                        "receptions": log.receptions,
+                        "yards": log.yards,
+                        "touchdowns": log.touchdowns,
+                        "fantasy_points": log.fantasy_points,
+                    }
+                )
+            return results
+        else:
+            return jsonify({"message": "Invalid player position"}, 400)
+
+    else:
+        return jsonify({"message": "Player not found"}, 404)
+
+
 # @app.route("/api/game/logs/<int:game_id>", methods=["GET"])
 def get_game_logs(game_id):
     game = Game.query.filter_by(game_id=game_id).first()
