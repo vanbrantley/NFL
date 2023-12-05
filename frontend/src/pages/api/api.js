@@ -46,6 +46,20 @@ export const getGames = async () => {
 
 };
 
+
+export const getGameLogsForPlayer = async (id) => {
+  try{
+      const requestUrl = `api/player/logs/${id}`
+      const response = await api.get(requestUrl);
+      //console.log(response);
+      return response.data;
+  }catch (error) {
+      console.error('Error fetching data:', error);
+    throw error;
+  }
+
+};
+
 // export const getGameByID = async (game_id) => {
 //   try{
 //       const requestUrl = `api/game/${game_id}`

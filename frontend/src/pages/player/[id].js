@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/router";
 import { getPlayerByID } from '../api/api';
 import PlayerBio from '../../../components/PlayerBio';
+import PasserLogsView from '../../../components/PasserLogsView';
+import ReceiverLogsView from '../../../components/ReceiverLogsView';
+import RusherLogsView from '../../../components/RusherLogsView';
 
 const PlayerDetails = () => {
 
@@ -53,6 +56,29 @@ const PlayerDetails = () => {
             <p>Loading...</p>
           )}
           <h1>Game Logs</h1>
+          {data ? (
+            <div>              
+              {data.position === 'QB' && <PasserLogsView id={data.player_id} />}
+              {(data.position === 'WR' || data.position === 'TE')  && <ReceiverLogsView id={data.player_id} />}
+              {data.position === 'RB' && <RusherLogsView id={data.player_id} />}
+              {!(data.position === 'RB' || data.position === 'WR'|| data.position === 'QB') && <p>No game logs available for this position</p>}
+            </div>
+          ) : (
+            <p>Loading...</p>
+          )}
+          
+          {/* <div>
+            <PasserLogsView
+             passing_log_id={1}
+             game_id={1}
+             player_id={1}
+             completions={69}
+             attempts={69}
+             yards={69}
+             touchdowns={69}
+             interceptions={69}
+             fantasy_points={69}/>
+          </div> */}
         </div>
         
       );
