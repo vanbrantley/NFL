@@ -79,7 +79,7 @@ class Game(db.Model):
     receiving_game_logs = relationship("ReceivingGameLog", back_populates="game")
 
     def __repr__(self):
-        return f"<Game {self.home_team_abbreviation} {self.away_team_abbreviation}>"
+        return f"<Game {self.home_team_id} {self.away_team_id}>"
 
 
 class PassingGameLog(db.Model):

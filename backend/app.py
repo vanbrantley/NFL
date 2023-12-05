@@ -33,6 +33,7 @@ app.add_url_rule("/api/player/<player_id>", view_func=get_player)
 app.add_url_rule("/api/games", view_func=get_games)
 app.add_url_rule("/api/game/logs/<game_id>", view_func=get_game_logs)
 app.add_url_rule("/api/player/logs/<player_id>", view_func=get_player_game_logs)
+app.add_url_rule("/api/player/logs/filter", view_func=filter_player_logs)
 
 if __name__ == "__main__":
     app.run(debug=True)
