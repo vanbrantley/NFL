@@ -72,3 +72,16 @@ export const getGameLogsForPlayer = async (id) => {
 //   }
 
 // };
+
+export const getFilteredLogs = async (position, start_week, end_week) => {
+  try{
+    const requestUrl = `api/player/logs/filter?position=${position}&start_week=${start_week}&end_week=${end_week}`
+    const response = await api.get(requestUrl);
+    //console.log(response);
+    return response.data;
+}catch (error) {
+    console.error('Error fetching data:', error);
+  throw error;
+}
+
+}

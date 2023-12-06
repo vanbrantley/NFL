@@ -61,7 +61,7 @@ const PlayerDetails = () => {
               {data.position === 'QB' && <PasserLogsView id={data.player_id} />}
               {(data.position === 'WR' || data.position === 'TE')  && <ReceiverLogsView id={data.player_id} />}
               {data.position === 'RB' && <RusherLogsView id={data.player_id} />}
-              {!(data.position === 'RB' || data.position === 'WR'|| data.position === 'QB') && <p>No game logs available for this position</p>}
+              {!(data.position === 'RB' || data.position === 'WR'|| data.position === 'QB' || data.position === 'TE') && <p>No game logs available for this position</p>}
             </div>
           ) : (
             <p>Loading...</p>

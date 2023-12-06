@@ -1,14 +1,16 @@
 
 import { Inter } from 'next/font/google'
 import Navbar from '../../components/Navbar'
+import FilteredLogsManipulator from '../../components/FilteredLogsManipulator';
 
 const inter = Inter({ subsets: ['latin'] })
 
 const Home = () => {
   return (
     <div>
-      <h1>Home Page</h1>
-      {/* Your content goes here */}
+      <h1>Fantasy Finesser</h1>
+      <FilteredLogsManipulator />
+
     </div>
   );
 };
