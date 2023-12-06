@@ -184,6 +184,12 @@ Navigate to the frontend folder from the main folder
 cd frontend
 ```
 
+Before launching the frontend for the first time, install required packages
+
+```sh
+npm install
+```
+
 Launch the frontend server
 ```sh
 npm run dev

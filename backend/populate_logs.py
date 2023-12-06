@@ -233,7 +233,9 @@ def main():
             for game in games:
                 game_id = game.game_id
                 home_team_id = game.home_team_id
+                home_team_abbreviation = game.home_team.abbreviation
                 away_team_id = game.away_team_id
+                away_team_abbreviation = game.away_team.abbreviation
                 box_score_url = game.box_score_url
 
                 home_players = Player.query.filter_by(team_id=home_team_id).all()
@@ -256,7 +258,9 @@ def main():
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "html.parser")
 
-                    print(f"Adding {away_team_id} @ {home_team_id} game logs...")
+                    print(
+                        f"Adding {away_team_abbreviation} @ {home_team_abbreviation} game logs..."
+                    )
 
                     home_team_stats_container = soup.find("div", id="player-stats-home")
                     away_team_stats_container = soup.find("div", id="player-stats-away")

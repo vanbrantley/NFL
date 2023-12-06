@@ -58,6 +58,9 @@ def get_player(player_id):
                 "player_id": player.player_id,
                 "player_name": player.player_name,
                 "team_id": player.team_id,
+                "team_abbreviation": player.team.abbreviation,
+                "team_full_name": player.team.full_name,
+                "team_primary_color": player.team.primary_color,
                 "position": player.position,
                 "jersey_number": player.jersey_number,
                 "image_url": player.image_url,
@@ -251,24 +254,21 @@ def get_game_logs(game_id):
 # "/api/player/logs/filter"
 def filter_player_logs():
     position = request.args.get("position")
-    team = request.args.get("team")
     start_week = request.args.get("start_week")
     end_week = request.args.get("end_week")
+    team = request.args.get("team")
 
     results = []
 
     # check arguments against null
     # handle join based on the position - All/QB/RB/WR/TE/FLEX
 
-    # want to add the constraint for the weeks
-    # then want to sum them
-
     if position == "QB":
-        print("QB")
         joined_table = (
             db.session.query(
                 Player.player_id,
                 Player.player_name,
+                Player.image_url,
                 func.sum(PassingGameLog.completions).label("total_completions"),
                 func.sum(PassingGameLog.attempts).label("total_attempts"),
                 func.sum(PassingGameLog.yards).label("total_yards"),
@@ -289,6 +289,7 @@ def filter_player_logs():
                 {
                     "player_id": row.player_id,
                     "player_name": row.player_name,
+                    "image_url": row.image_url,
                     "total_completions": row.total_completions,
                     "total_attempts": row.total_attempts,
                     "total_yards": row.total_yards,
@@ -299,11 +300,11 @@ def filter_player_logs():
             )
 
     elif position == "WR":
-        print("WR")
         joined_table = (
             db.session.query(
                 Player.player_id,
                 Player.player_name,
+                Player.image_url,
                 func.sum(ReceivingGameLog.targets).label("total_targets"),
                 func.sum(ReceivingGameLog.receptions).label("total_receptions"),
                 func.sum(ReceivingGameLog.yards).label("total_yards"),
@@ -328,6 +329,7 @@ def filter_player_logs():
                 {
                     "player_id": row.player_id,
                     "player_name": row.player_name,
+                    "image_url": row.image_url,
                     "total_targets": row.total_targets,
                     "total_receptions": row.total_receptions,
                     "total_yards": row.total_yards,
@@ -337,11 +339,11 @@ def filter_player_logs():
             )
 
     elif position == "RB":
-        print("RB")
         joined_table = (
             db.session.query(
                 Player.player_id,
                 Player.player_name,
+                Player.image_url,
                 func.sum(RushingGameLog.carries).label("total_carries"),
                 func.sum(RushingGameLog.yards).label("total_yards"),
                 func.sum(RushingGameLog.touchdowns).label("total_touchdowns"),
@@ -362,6 +364,7 @@ def filter_player_logs():
                 {
                     "player_id": row.player_id,
                     "player_name": row.player_name,
+                    "image_url": row.image_url,
                     "total_carries": row.total_carries,
                     "total_yards": row.total_yards,
                     "total_touchdowns": row.total_touchdowns,
