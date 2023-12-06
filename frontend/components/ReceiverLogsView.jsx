@@ -33,30 +33,30 @@ const ReceiverLogsView = ({ id }) => {
                         <div className="grid grid-cols-7 gap-4">
 
                             <div className="flex justify-center">
-                                <p>Week</p>
+                                <p style={{ fontWeight: "bold" }}>Week</p>
                             </div>
                             <div className="flex justify-center">
-                                <p>Opponent</p>
+                                <p style={{ fontWeight: "bold" }}>Opponent</p>
                             </div>
                             <div className="flex justify-center">
-                                <p>Receptions</p>
+                                <p style={{ fontWeight: "bold" }}>Receptions</p>
                             </div>
                             <div className="flex justify-center">
-                                <p>Targets</p>
+                                <p style={{ fontWeight: "bold" }}>Targets</p>
                             </div>
                             <div className="flex justify-center">
-                                <p>Yards</p>
+                                <p style={{ fontWeight: "bold" }}>Yards</p>
                             </div>
                             <div className="flex justify-center">
-                                <p>Touchdowns</p>
+                                <p style={{ fontWeight: "bold" }}>Touchdowns</p>
                             </div>
                             <div className="flex justify-center">
-                                <p>Fantasy Points</p>
+                                <p style={{ fontWeight: "bold" }}>Fantasy Points</p>
                             </div>
 
                             {data.map((log, i) => {
 
-                                const { receiving_log_id, game_id, week, player_id, targets, receptions, yards, touchdowns, fantasy_points } = log;
+                                const { receiving_log_id, game_id, week, opponent, player_id, targets, receptions, yards, touchdowns, fantasy_points } = log;
 
                                 return (
                                     <>
@@ -64,8 +64,13 @@ const ReceiverLogsView = ({ id }) => {
                                         <div className="flex justify-center">
                                             <p>{week}</p>
                                         </div>
-                                        <div className="flex justify-center">
-                                            <p>Opponent</p>
+                                        <div className="flex justify-center items-center">
+                                            <p>{opponent}</p>
+                                            <img
+                                                src={`/images/team-logos/${opponent}.png`}
+                                                height="30px"
+                                                width="30px"
+                                            />
                                         </div>
                                         <div className="flex justify-center">
                                             <p>{receptions}</p>

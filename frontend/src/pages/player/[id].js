@@ -14,7 +14,6 @@ const PlayerDetails = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    // Check if team is defined before making the API request
     if (id) {
       console.log(id);
       const fetchData = async () => {
@@ -29,7 +28,7 @@ const PlayerDetails = () => {
 
       fetchData();
     }
-  }, [id]); // Add player as a dependency
+  }, [id]);
 
 
   return (
@@ -46,7 +45,9 @@ const PlayerDetails = () => {
             height={data.height}
             image_url={data.image_url}
             weight={data.weight}
-            team={data.team_full_name}
+            team_abbreviation={data.team_abbreviation}
+            team_full_name={data.team_full_name}
+            team_primary_color={data.team_primary_color}
           />
         </div>
       ) : (
