@@ -5,7 +5,10 @@ const PassingFilteredLogsTable = ({ data }) => {
     return (
 
         <div className="bg-gray-100 rounded-lg p-4 m-2 shadow-md transition-transform transform">
-            <div className="grid grid-cols-7 gap-4">
+            <div className="grid grid-cols-8 gap-4">
+                <div className="flex justify-center col-span-1">
+                    <p>Rank</p>
+                </div>
                 <div className="flex justify-center col-span-1">
                     <p>Player</p>
                 </div>
@@ -38,8 +41,11 @@ const PassingFilteredLogsTable = ({ data }) => {
                     <Link href={`/player/${player_id}`}>
                         <div className="bg-gray-100 rounded-lg p-4 m-2 shadow-md hover:shadow-lg  transition-transform transform hover:-translate-y-1">
 
-                            <div className="grid grid-cols-7 gap-4">
+                            <div className="grid grid-cols-8 gap-4">
 
+                                <div className="flex justify-center items-center">
+                                    <p>{i + 1}</p>
+                                </div>
                                 <div className="flex justify-center items-center">
                                     <img
                                         src={`${image_url}`}

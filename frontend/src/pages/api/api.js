@@ -1,46 +1,55 @@
-// utils/api.js
-
 import axios from 'axios';
 
 const api = axios.create({
-  headers: 'Access-Control-Allow-Origin',  
-  baseURL: 'http://127.0.0.1:5000', // Replace with your API endpoint
+  headers: 'Access-Control-Allow-Origin',
+  baseURL: 'http://127.0.0.1:5000',
 });
 
-export const getTeamRoster = async (abbreviation) => {
-    try {
-      const requestUrl = `/api/roster/${abbreviation}`
-      const response = await api.get(requestUrl); // Replace with your API endpoint
+export const getTeamDetails = async (abbreviation) => {
+  try {
+    const requestUrl = `/api/team/details/${abbreviation}`
+    const response = await api.get(requestUrl);
     //   console.log(response);
-      return response.data;
-    } catch (error) {
-      // Handle errors (e.g., log them or return an error message)
-      console.error('Error fetching data:', error);
-      throw error;
-    }
-  };
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+};
+
+export const getTeamRoster = async (abbreviation) => {
+  try {
+    const requestUrl = `/api/team/roster/${abbreviation}`
+    const response = await api.get(requestUrl);
+    //   console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+};
 
 export const getPlayerByID = async (id) => {
-    try{
-        const requestUrl = `api/player/${id}`
-        const response = await api.get(requestUrl);
-        //console.log(response);
-        return response.data;
-    }catch (error) {
-        console.error('Error fetching data:', error);
-      throw error;
-    }
+  try {
+    const requestUrl = `api/player/${id}`
+    const response = await api.get(requestUrl);
+    //console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
 
 };
 
 export const getGames = async () => {
-  try{
-      const requestUrl = `api/games`
-      const response = await api.get(requestUrl);
-      //console.log(response);
-      return response.data;
-  }catch (error) {
-      console.error('Error fetching data:', error);
+  try {
+    const requestUrl = `api/games`
+    const response = await api.get(requestUrl);
+    //console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
     throw error;
   }
 
@@ -48,13 +57,13 @@ export const getGames = async () => {
 
 
 export const getGameLogsForPlayer = async (id) => {
-  try{
-      const requestUrl = `api/player/logs/${id}`
-      const response = await api.get(requestUrl);
-      //console.log(response);
-      return response.data;
-  }catch (error) {
-      console.error('Error fetching data:', error);
+  try {
+    const requestUrl = `api/player/logs/${id}`
+    const response = await api.get(requestUrl);
+    //console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
     throw error;
   }
 
@@ -74,14 +83,14 @@ export const getGameLogsForPlayer = async (id) => {
 // };
 
 export const getFilteredLogs = async (position, start_week, end_week) => {
-  try{
+  try {
     const requestUrl = `api/player/logs/filter?position=${position}&start_week=${start_week}&end_week=${end_week}`
     const response = await api.get(requestUrl);
     //console.log(response);
     return response.data;
-}catch (error) {
+  } catch (error) {
     console.error('Error fetching data:', error);
-  throw error;
-}
+    throw error;
+  }
 
 }

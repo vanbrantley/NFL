@@ -19,9 +19,32 @@ def hello_world():
     return jsonify({"data": data})
 
 
-# "/api/roster/<team_abbreviation>"
+# "/api/team/details/<team_abbreviation>"
+def get_team_details(team_abbreviation):
+    team = Team.query.filter_by(abbreviation=team_abbreviation).first()
+
+    if team:
+        return jsonify(
+            {
+                "team_id": team.team_id,
+                "city": team.city,
+                "team_name": team.team_name,
+                "full_name": team.full_name,
+                "abbreviation": team.abbreviation,
+                "conference": team.conference,
+                "division": team.division,
+                "bye": team.bye,
+                "primary_color": team.primary_color,
+                "secondary_color": team.secondary_color,
+                "teriary_color": team.tertiary_color,
+            }
+        )
+    else:
+        return jsonify({"message": "Team not found"}, 404)
+
+
+# "/api/team/roster/<team_abbreviation>"
 def get_team_roster(team_abbreviation):
-    # get team's id from the abbreviation
     team = Team.query.filter_by(abbreviation=team_abbreviation).first()
     team_id = team.team_id
 
@@ -30,20 +53,24 @@ def get_team_roster(team_abbreviation):
     # Convert the player objects to a list of dictionaries
     results = []
     for player in team_players:
-        results.append(
-            {
-                "player_id": player.player_id,
-                "player_name": player.player_name,
-                "team_id": player.team_id,
-                "position": player.position,
-                "jersey_number": player.jersey_number,
-                "image_url": player.image_url,
-                "height": player.height,
-                "weight": player.weight,
-                "experience": player.experience,
-                "college": player.college,
-            }
-        )
+        offensive_positions = ["QB", "RB", "WR", "TE", "K"]
+        player_position = player.position
+
+        if player_position in offensive_positions:
+            results.append(
+                {
+                    "player_id": player.player_id,
+                    "player_name": player.player_name,
+                    "team_id": player.team_id,
+                    "position": player.position,
+                    "jersey_number": player.jersey_number,
+                    "image_url": player.image_url,
+                    "height": player.height,
+                    "weight": player.weight,
+                    "experience": player.experience,
+                    "college": player.college,
+                }
+            )
 
     return jsonify(results)
 
@@ -352,7 +379,10 @@ def filter_player_logs():
             .join(RushingGameLog, Player.player_id == RushingGameLog.player_id)
             .join(Game, RushingGameLog.game_id == Game.game_id)
             .filter(
-                Game.week >= start_week, Game.week <= end_week, Player.position != "QB"
+                Game.week >= start_week,
+                Game.week <= end_week,
+                Player.position != "QB",
+                Player.position != "WR",
             )
             .group_by(Player.player_id)
             .order_by(desc("total_fantasy_points"))

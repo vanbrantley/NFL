@@ -28,7 +28,8 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 app.add_url_rule("/", view_func=hello_world)
-app.add_url_rule("/api/roster/<team_abbreviation>", view_func=get_team_roster)
+app.add_url_rule("/api/team/details/<team_abbreviation>", view_func=get_team_details)
+app.add_url_rule("/api/team/roster/<team_abbreviation>", view_func=get_team_roster)
 app.add_url_rule("/api/player/<player_id>", view_func=get_player)
 app.add_url_rule("/api/games", view_func=get_games)
 app.add_url_rule("/api/game/logs/<game_id>", view_func=get_game_logs)
