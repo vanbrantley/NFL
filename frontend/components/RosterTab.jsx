@@ -4,7 +4,7 @@ import Player from './Player';
 const RosterTab = ({ data }) => {
   return (
     <div>
-      <h2 className="text-xl font-semibold text-black">Roster:</h2>
+      <h2 className="text-xl font-semibold text-black">Roster</h2>
       {data ? (
         <div>
           {data.map((player, i) => (

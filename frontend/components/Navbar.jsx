@@ -54,8 +54,7 @@ const Navbar = () => {
               <li key={i}>
                 <Link href={`/team/${abbreviation}`}>
                     <img
-                      // src={`/images/${abbreviation}-logo.png`}
-                      src={`/png-images/${abbreviation}.png`}
+                      src={`/images/team-logos/${abbreviation}.png`}
                       className="w-25 h-25 cursor-pointer transform transition-transform hover:scale-125" // Set the width and height here
                     />
                 </Link>
