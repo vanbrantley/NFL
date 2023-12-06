@@ -2,7 +2,7 @@
     <img src="frontend/public/images/nfl-logo.png" width="200" height="200" alt="NFL logo"/>
 </p>
 
-<h1 align="center"><strong>NFL</strong></h1>
+<h1 align="center"><strong>NFL Fantasy Finesser</strong></h1>
 
 <p align="center">
     <a href="https://flask.palletsprojects.com/en/3.0.x/">
