@@ -18,7 +18,7 @@ const TeamDetails = () => {
       const fetchTeamDetails = async () => {
         try {
           const teamDetailsResponse = await getTeamDetails(team);
-          //   console.log(teamDetailsResponse);
+          console.log(teamDetailsResponse);
           setTeamDetails(teamDetailsResponse);
         } catch (error) {
           // Handle the error, e.g., display an error message

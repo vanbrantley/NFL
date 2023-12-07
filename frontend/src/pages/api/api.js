@@ -44,9 +44,9 @@ export const getPlayerByID = async (id) => {
 
 export const getGames = async () => {
   try {
-    const requestUrl = `api/games`
+    const requestUrl = `api/games`;
     const response = await api.get(requestUrl);
-    //console.log(response);
+    // console.log(response);
     return response.data;
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -86,7 +86,7 @@ export const getFilteredLogs = async (position, start_week, end_week, sort_by, a
   try {
     const order = ascending ? "ascending" : "descending";
     const requestUrl = `api/player/logs/filter?position=${position}&start_week=${start_week}&end_week=${end_week}&sort_by=${sort_by}&order=${order}`;
-    console.log(requestUrl);
+    // console.log(requestUrl);
     const response = await api.get(requestUrl);
     //console.log(response);
     return response.data;

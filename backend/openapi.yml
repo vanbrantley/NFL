@@ -1,0 +1,185 @@
+openapi: '3.0.2'
+info:
+  title: NFL API
+  version: '1.0'
+servers:
+  - url: http://127.0.0.1:5000/api
+paths:
+  /test:
+    get:
+      responses:
+        '200':
+          description: OK
+  /team/details/{team_abbreviation}:
+    get:
+      description: 'Get details for a specific team'
+      parameters:
+        - name: team_abbreviation
+          in: path
+          description: The abbreviation of the team
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  team_id:
+                    type: integer
+                  city:
+                    type: string
+                  team_name:
+                    type: string
+                  full_name:
+                    type: string
+                  abbreviation:
+                    type: string
+                  conference:
+                    type: string
+                  division:
+                    type: string
+                  bye:
+                    type: integer
+                  primary_color:
+                    type: string
+                  secondary_color:
+                    type: string
+                  tertiary_color:
+                    type: string
+                    nullable: true
+                required:
+                  - team_id
+                  - city
+                  - team_name
+                  - full_name
+                  - abbreviation
+                  - conference
+                  - division
+                  - bye
+                  - primary_color
+                  - secondary_color
+
+  /player/logs/filter:
+    get:
+      description: 'Get the sorted player logs that match the query criteria'
+      parameters:
+        - name: position
+          in: query
+          description: The player's position.
+          schema:
+            type: string
+        - name: start_week
+          in: query
+          description: The start week for filtering.
+          schema:
+            type: integer
+        - name: end_week
+          in: query
+          description: The end week for filtering.
+          schema:
+            type: integer
+        - name: sort_by
+          in: query
+          description: The field to sort by.
+          schema:
+            type: string
+            enum:
+              - completions
+              - attempts
+              - yards
+              - touchdowns
+              - fantasy_points
+              - targets
+              - receptions
+              - total_carries
+        - name: order
+          in: query
+          description: The sorting order.
+          schema:
+            type: string
+            enum:
+              - ascending
+              - descending
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/QBResponse'
+                  - $ref: '#/components/schemas/WRResponse'
+                  - $ref: '#/components/schemas/RBResponse'
+
+
+components:
+  schemas:
+    QBResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          player_id:
+            type: integer
+          player_name:
+            type: string
+          image_url:
+            type: string
+          total_completions:
+            type: integer
+          total_attempts:
+            type: integer
+          total_yards:
+            type: integer
+          total_touchdowns:
+            type: integer
+          total_interceptions:
+            type: integer
+          total_fantasy_points:
+            type: integer
+
+    WRResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          player_id:
+            type: integer
+          player_name:
+            type: string
+          image_url:
+            type: string
+          total_targets:
+            type: integer
+          total_receptions:
+            type: integer
+          total_yards:
+            type: integer
+          total_touchdowns:
+            type: integer
+          total_fantasy_points:
+            type: integer
+
+    RBResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          player_id:
+            type: integer
+          player_name:
+            type: string
+          image_url:
+            type: string
+          total_carries:
+            type: integer
+          total_yards:
+            type: integer
+          total_touchdowns:
+            type: integer
+          total_fantasy_points:
+            type: integer
