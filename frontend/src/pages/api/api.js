@@ -82,9 +82,11 @@ export const getGameLogsForPlayer = async (id) => {
 
 // };
 
-export const getFilteredLogs = async (position, start_week, end_week) => {
+export const getFilteredLogs = async (position, start_week, end_week, sort_by, ascending) => {
   try {
-    const requestUrl = `api/player/logs/filter?position=${position}&start_week=${start_week}&end_week=${end_week}`
+    const order = ascending ? "ascending" : "descending";
+    const requestUrl = `api/player/logs/filter?position=${position}&start_week=${start_week}&end_week=${end_week}&sort_by=${sort_by}&order=${order}`;
+    console.log(requestUrl);
     const response = await api.get(requestUrl);
     //console.log(response);
     return response.data;

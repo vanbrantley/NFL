@@ -50,27 +50,27 @@ const Navbar = () => {
           </li>
 
           {team_abbreviations.map((abbreviation, i) => {
-            return(
+            return (
               <li key={i}>
                 <Link href={`/team/${abbreviation}`}>
-                    <img
-                      src={`/images/team-logos/${abbreviation}.png`}
-                      className="w-25 h-25 cursor-pointer transform transition-transform hover:scale-125" // Set the width and height here
-                    />
+                  <img
+                    src={`/images/team-logos/${abbreviation}.png`}
+                    className="w-25 h-25 cursor-pointer transform transition-transform hover:scale-125" // Set the width and height here
+                  />
                 </Link>
               </li>
             );
-            
+
           })}
 
-          <li>
+          {/* <li>
             <Link href="/FantasyTeam" className="text-white hover:text-rose-700">Fantasy Team</Link>
-          </li>
+          </li> */}
 
         </ul>
       </div>
     </nav>
-    
+
   );
 };
 

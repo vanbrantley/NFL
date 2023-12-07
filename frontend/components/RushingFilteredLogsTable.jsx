@@ -1,29 +1,17 @@
 import Link from "next/link";
 
-const RushingFilteredLogsTable = ({ data }) => {
+const RushingFilteredLogsTable = ({ data, renderHeader }) => {
 
     return (
 
         <div className="bg-gray-100 rounded-lg p-4 m-2 shadow-md transition-transform transform">
             <div className="grid grid-cols-6 gap-4">
-                <div className="flex justify-center col-span-1">
-                    <p>Rank</p>
-                </div>
-                <div className="flex justify-center col-span-1">
-                    <p>Player</p>
-                </div>
-                <div className="flex justify-center col-span-1">
-                    <p>Carries</p>
-                </div>
-                <div className="flex justify-center col-span-1">
-                    <p>Yards</p>
-                </div>
-                <div className="flex justify-center col-span-1">
-                    <p>Touchdowns</p>
-                </div>
-                <div className="flex justify-center col-span-1">
-                    <p>Fantasy Points</p>
-                </div>
+                {renderHeader('rank', 'Rank')}
+                {renderHeader('player', 'Player')}
+                {renderHeader('carries', 'Carries')}
+                {renderHeader('yards', 'Yards')}
+                {renderHeader('touchdowns', 'Touchdowns')}
+                {renderHeader('fantasy_points', 'Fantasy Points')}
             </div>
 
             {data.map((result, i) => {
@@ -41,11 +29,11 @@ const RushingFilteredLogsTable = ({ data }) => {
                                     <p>{i + 1}</p>
                                 </div>
                                 <div className="flex justify-center items-center">
-                                    <img
+                                    {image_url && <img
                                         src={`${image_url}`}
                                         alt="Player Icon"
                                         className="w-50 h-50 mb-2"
-                                    />
+                                    />}
                                     <p>{player_name}</p>
                                 </div>
                                 <div className="flex justify-center items-center">

@@ -7,7 +7,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <title>NFL</title>
+        <title>NFL Finesser</title>
       </Head>
       <Navbar />
       <Component {...pageProps} />

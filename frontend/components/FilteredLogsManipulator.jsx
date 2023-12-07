@@ -11,16 +11,13 @@ const FilteredLogsManipulator = () => {
   const [position, setPosition] = useState("QB");
   const [startWeek, setStartWeek] = useState(1);
   const [endWeek, setEndWeek] = useState(2);
-
-  // use react-select: https://react-select.com/home
-  // position select
-  // startWeek select
-  // endWeek select 
+  const [sortBy, setSortBy] = useState("fantasy_points");
+  const [isAscending, setIsAscending] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getFilteredLogs(position, startWeek, endWeek);
+        const response = await getFilteredLogs(position, startWeek, endWeek, sortBy, isAscending);
         console.log(response);
         setData(response);
       } catch (error) {
@@ -29,7 +26,7 @@ const FilteredLogsManipulator = () => {
     };
 
     fetchData();
-  }, [position, startWeek, endWeek]);
+  }, [position, startWeek, endWeek, sortBy, isAscending]);
 
   const positionOptions = [
     { value: 'QB', label: 'QB' },
@@ -64,7 +61,12 @@ const FilteredLogsManipulator = () => {
   ];
 
   const handlePositionSelect = (e) => {
-    setPosition(e.value);
+    const newPosition = e.value;
+    if (newPosition !== position) {
+      setPosition(newPosition);
+      if (isAscending) setIsAscending(false);
+      setSortBy("fantasy_points");
+    }
   };
 
   const handleStartWeekSelect = (e) => {
@@ -74,6 +76,31 @@ const FilteredLogsManipulator = () => {
   const handleEndWeekSelect = (e) => {
     setEndWeek(e.value);
   };
+
+  const handleHeaderClick = (columnName) => {
+    if (columnName !== 'rank' && columnName !== 'player') {
+      if (sortBy === columnName) {
+        // If the same column is clicked, toggle the sorting order
+        setIsAscending(!isAscending);
+      } else {
+        // If a new column is clicked, set it as the sortBy column and default to ascending order
+        setSortBy(columnName);
+        setIsAscending(false);
+      }
+    }
+  };
+
+  const renderHeader = (columnName, displayName) => (
+    <div
+      className={`flex justify-center col-span-1 ${columnName !== 'rank' && columnName !== 'player' ? 'cursor-pointer' : ''} ${sortBy === columnName ? 'font-bold' : ''}`}
+      onClick={() => handleHeaderClick(columnName)}
+    >
+      <p>{displayName}</p>
+      {sortBy === columnName && (
+        <span>{isAscending ? ' ↑' : ' ↓'}</span>
+      )}
+    </div>
+  );
 
   return (
     <div>
@@ -95,9 +122,9 @@ const FilteredLogsManipulator = () => {
 
       {data ? (
         <div>
-          {(position == "QB") && <PassingFilteredLogsTable data={data} />}
-          {(position == "RB") && <RushingFilteredLogsTable data={data} />}
-          {(position == "WR") && <ReceivingFilteredLogsTable data={data} />}
+          {(position == "QB") && <PassingFilteredLogsTable data={data} renderHeader={renderHeader} />}
+          {(position == "RB") && <RushingFilteredLogsTable data={data} renderHeader={renderHeader} />}
+          {(position == "WR") && <ReceivingFilteredLogsTable data={data} renderHeader={renderHeader} />}
         </div>
       ) : (
         <p>Loading...</p>

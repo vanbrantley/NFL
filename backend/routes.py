@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from sqlalchemy import func, desc
+from sqlalchemy import func, asc, desc
 
 # from app import app
 from models import (
@@ -301,12 +301,20 @@ def filter_player_logs():
     position = request.args.get("position")
     start_week = request.args.get("start_week")
     end_week = request.args.get("end_week")
-    team = request.args.get("team")
+    sort_by = request.args.get("sort_by")
+    order = request.args.get("order")
+
+    # test to make sure that arguments are valid
 
     results = []
 
-    # check arguments against null
-    # handle join based on the position - All/QB/RB/WR/TE/FLEX
+    order_by_clause = None
+    if sort_by is not None and order is not None:
+        # Dynamically construct the order_by clause based on sort_by and order
+        if order.lower() == "ascending":
+            order_by_clause = asc("total_" + sort_by)
+        elif order.lower() == "descending":
+            order_by_clause = desc("total_" + sort_by)
 
     if position == "QB":
         joined_table = (
@@ -325,7 +333,7 @@ def filter_player_logs():
             .join(Game, PassingGameLog.game_id == Game.game_id)
             .filter(Game.week >= start_week, Game.week <= end_week)
             .group_by(Player.player_id)
-            .order_by(desc("total_fantasy_points"))
+            .order_by(order_by_clause)
             .all()
         )
 
@@ -365,7 +373,7 @@ def filter_player_logs():
                 Player.position != "RB",
             )
             .group_by(Player.player_id)
-            .order_by(desc("total_fantasy_points"))
+            .order_by(order_by_clause)
             .all()
         )
 
@@ -403,7 +411,7 @@ def filter_player_logs():
                 Player.position != "WR",
             )
             .group_by(Player.player_id)
-            .order_by(desc("total_fantasy_points"))
+            .order_by(order_by_clause)
             .all()
         )
 

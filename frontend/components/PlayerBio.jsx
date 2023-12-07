@@ -8,13 +8,15 @@ const PlayerBio = ({ id, name, position, number, college, experience, height, im
                     className="w-50 h-50 mb-2"
                 />
                 <p className="text-xl font-semibold text-black">{name}</p>
-                <p className="text-lg text-gray-600">{position} #{number}</p>
-                <p className="text-lg text-gray-600">{team_full_name}</p>
-                <img
-                    src={`/images/team-logos/${team_abbreviation}.png`}
-                    height="100px"
-                    width="100px"
-                />
+                <p className="text-lg text-gray-600">{position} {number ? `#${number}` : ''}</p>
+                <div className="flex justify-center items-center">
+                    <p className="text-lg text-gray-600">{team_full_name}</p>
+                    <img
+                        src={`/images/team-logos/${team_abbreviation}.png`}
+                        height="30px"
+                        width="30px"
+                    />
+                </div>
             </div>
         </div>
     );
