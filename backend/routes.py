@@ -240,16 +240,11 @@ class PlayerGameLogsResource(Resource):
             return jsonify({"message": "Player not found"}, 404)
 
 
-# "/api/games/" route
-@game_namespace.route("/")
+# "/api/games/week/<week_number>" route
+@game_namespace.route("/week/<week_number>")
 class GamesResource(Resource):
-    def get(self):
-        week = request.args.get("week")
-
-        if week:
-            games = Game.query.filter_by(week=week).all()
-        else:
-            games = Game.query.all()
+    def get(self, week_number):
+        games = Game.query.filter_by(week=week_number).all()
 
         if games:
             results = []
@@ -281,8 +276,42 @@ class GamesResource(Resource):
             api.abort(404, message="No games found")
 
 
-# "/api/games/logs/<game_id>" route
-@game_namespace.route("/logs/<game_id>")
+# "/api/games/team/<team_abbreviation>" route
+@game_namespace.route("/team/<team_abbreviation>")
+class GamesResource(Resource):
+    def get(self, team_abbreviation):
+        team = Team.query.filter_by(abbreviation=team_abbreviation).first()
+        team_games = team.home_games + team.away_games
+        sorted_games = sorted(team_games, key=lambda game: game.week)
+
+        results = []
+        for game in sorted_games:
+            results.append(
+                {
+                    "game_id": game.game_id,
+                    "home_team_id": game.home_team_id,
+                    "home_team_full_name": game.home_team.full_name,
+                    "home_team_abbreviation": game.home_team.abbreviation,
+                    "home_team_primary_color": game.home_team.primary_color,
+                    "home_team_secondary_color": game.home_team.secondary_color,
+                    "home_team_tertiary_color": game.home_team.tertiary_color,
+                    "away_team_id": game.away_team_id,
+                    "away_team_full_name": game.away_team.full_name,
+                    "away_team_abbreviation": game.away_team.abbreviation,
+                    "away_team_primary_color": game.away_team.primary_color,
+                    "away_team_secondary_color": game.away_team.secondary_color,
+                    "away_team_tertiary_color": game.away_team.tertiary_color,
+                    "season": game.season,
+                    "week": game.week,
+                    "box_score_url": game.box_score_url,
+                }
+            )
+
+        return jsonify(results)
+
+
+# "/api/games/game/logs/<game_id>" route
+@game_namespace.route("/game/logs/<game_id>")
 class GamesLogsResource(Resource):
     def get(self, game_id):
         game = Game.query.filter_by(game_id=game_id).first()
@@ -301,6 +330,7 @@ class GamesLogsResource(Resource):
                     "game_id": log.game_id,
                     "week": log.game.week,
                     "player_id": log.player_id,
+                    "team_id": log.team_id,
                     "player_name": log.player.player_name,
                     "completions": log.completions,
                     "attempts": log.attempts,
@@ -318,6 +348,7 @@ class GamesLogsResource(Resource):
                     "game_id": log.game_id,
                     "week": log.game.week,
                     "player_id": log.player_id,
+                    "team_id": log.team_id,
                     "player_name": log.player.player_name,
                     "carries": log.carries,
                     "yards": log.yards,
@@ -333,6 +364,7 @@ class GamesLogsResource(Resource):
                     "game_id": log.game_id,
                     "week": log.game.week,
                     "player_id": log.player_id,
+                    "team_id": log.team_id,
                     "player_name": log.player.player_name,
                     "targets": log.targets,
                     "receptions": log.receptions,
