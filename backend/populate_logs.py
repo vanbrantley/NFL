@@ -68,7 +68,7 @@ def main():
     # each of those has a div class_= stats_rows
     # with a table inside class_= stats-table
 
-    def get_passing_logs(container, isHome):
+    def get_passing_logs(container, isHome, team_id):
         stats_rows = container.find("div", class_="stats-rows")
 
         player_rows = stats_rows.find_all("tr", class_="no-hover data-row")
@@ -108,6 +108,7 @@ def main():
             passing_log = PassingGameLog(
                 game_id=game_id,
                 player_id=player_id,
+                team_id=team_id,
                 completions=completions,
                 attempts=attempts,
                 yards=yards,
@@ -118,7 +119,7 @@ def main():
 
             passing_logs.append(passing_log)
 
-    def get_rushing_logs(container, isHome):
+    def get_rushing_logs(container, isHome, team_id):
         stats_rows = container.find("div", class_="stats-rows")
 
         player_rows = stats_rows.find_all("tr", class_="no-hover data-row")
@@ -156,6 +157,7 @@ def main():
             rushing_log = RushingGameLog(
                 game_id=game_id,
                 player_id=player_id,
+                team_id=team_id,
                 carries=carries,
                 yards=yards,
                 touchdowns=touchdowns,
@@ -164,7 +166,7 @@ def main():
 
             rushing_logs.append(rushing_log)
 
-    def get_receiving_logs(container, isHome):
+    def get_receiving_logs(container, isHome, team_id):
         stats_rows = container.find("div", class_="stats-rows")
 
         player_rows = stats_rows.find_all("tr", class_="no-hover data-row")
@@ -203,6 +205,7 @@ def main():
             receiving_log = ReceivingGameLog(
                 game_id=game_id,
                 player_id=player_id,
+                team_id=team_id,
                 targets=targets,
                 receptions=receptions,
                 yards=yards,
@@ -310,12 +313,12 @@ def main():
                     # print(away_team_rushing)
                     # print(away_team_receiving)
 
-                    get_passing_logs(home_team_passing, True)
-                    get_rushing_logs(home_team_rushing, True)
-                    get_receiving_logs(home_team_receiving, True)
-                    get_passing_logs(away_team_passing, False)
-                    get_rushing_logs(away_team_rushing, False)
-                    get_receiving_logs(away_team_receiving, False)
+                    get_passing_logs(home_team_passing, True, home_team_id)
+                    get_rushing_logs(home_team_rushing, True, home_team_id)
+                    get_receiving_logs(home_team_receiving, True, home_team_id)
+                    get_passing_logs(away_team_passing, False, away_team_id)
+                    get_rushing_logs(away_team_rushing, False, away_team_id)
+                    get_receiving_logs(away_team_receiving, False, away_team_id)
 
                 else:
                     print(

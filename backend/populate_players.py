@@ -46,7 +46,7 @@ try:
         "player_name": "nfl-o-roster__player-name",
     }
 
-    # loop through items
+    # loop through team dictionary items
     for team, abbreviation in nfl_teams.items():
         print(f"Adding players for Team: {abbreviation}")
 

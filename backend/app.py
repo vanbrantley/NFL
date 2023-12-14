@@ -3,6 +3,7 @@ import os
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from dotenv import load_dotenv
 from models import db
 from routes import api, TeamDetailsResource
@@ -25,10 +26,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 api.init_app(app)
 
-# Register Flask-RESTx resources
-# api.add_resource(HelloWorldResource, "/")
-# api.add_resource(TeamDetailsResource, "/api/team/details/<team_abbreviation>")
-# Add similar lines for other resources
+migrate = Migrate(app, db)
 
 if __name__ == "__main__":
     app.run(debug=True)

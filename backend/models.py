@@ -26,6 +26,9 @@ class Team(db.Model):
     away_games = relationship(
         "Game", foreign_keys="Game.away_team_id", back_populates="away_team"
     )
+    passing_game_logs = db.relationship("PassingGameLog", back_populates="team")
+    rushing_game_logs = db.relationship("RushingGameLog", back_populates="team")
+    receiving_game_logs = db.relationship("ReceivingGameLog", back_populates="team")
 
     def __repr__(self):
         return f"<Team {self.abbreviation}>"
@@ -43,6 +46,7 @@ class Player(db.Model):
     weight = db.Column(db.Integer, nullable=False)
     experience = db.Column(db.String(2), nullable=False)
     college = db.Column(db.String(100), nullable=False)
+    active = db.Column(db.Boolean, default=True, nullable=False)
 
     # relationships
     team = relationship("Team", back_populates="players")
@@ -89,6 +93,7 @@ class PassingGameLog(db.Model):
     player_id = db.Column(
         db.Integer, db.ForeignKey("players.player_id"), nullable=False
     )
+    team_id = db.Column(db.Integer, db.ForeignKey("teams.team_id"), nullable=False)
     completions = db.Column(db.Integer, nullable=False)
     attempts = db.Column(db.Integer, nullable=False)
     yards = db.Column(db.Integer, nullable=False)
@@ -99,6 +104,7 @@ class PassingGameLog(db.Model):
     # relationships
     game = relationship("Game", back_populates="passing_game_logs")
     player = relationship("Player", back_populates="passing_game_logs")
+    team = db.relationship("Team", back_populates="passing_game_logs")
 
 
 class RushingGameLog(db.Model):
@@ -108,6 +114,7 @@ class RushingGameLog(db.Model):
     player_id = db.Column(
         db.Integer, db.ForeignKey("players.player_id"), nullable=False
     )
+    team_id = db.Column(db.Integer, db.ForeignKey("teams.team_id"), nullable=False)
     carries = db.Column(db.Integer, nullable=False)
     yards = db.Column(db.Integer, nullable=False)
     touchdowns = db.Column(db.Integer, nullable=False)
@@ -116,6 +123,7 @@ class RushingGameLog(db.Model):
     # relationships
     game = relationship("Game", back_populates="rushing_game_logs")
     player = relationship("Player", back_populates="rushing_game_logs")
+    team = db.relationship("Team", back_populates="rushing_game_logs")
 
 
 class ReceivingGameLog(db.Model):
@@ -125,6 +133,7 @@ class ReceivingGameLog(db.Model):
     player_id = db.Column(
         db.Integer, db.ForeignKey("players.player_id"), nullable=False
     )
+    team_id = db.Column(db.Integer, db.ForeignKey("teams.team_id"), nullable=False)
     targets = db.Column(db.Integer, nullable=False)
     receptions = db.Column(db.Integer, nullable=False)
     yards = db.Column(db.Integer, nullable=False)
@@ -134,3 +143,4 @@ class ReceivingGameLog(db.Model):
     # relationships
     game = relationship("Game", back_populates="receiving_game_logs")
     player = relationship("Player", back_populates="receiving_game_logs")
+    team = db.relationship("Team", back_populates="receiving_game_logs")

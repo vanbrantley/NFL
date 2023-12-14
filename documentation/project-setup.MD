@@ -164,9 +164,16 @@ cd backend
 
 Actviate your virtual environment
 
+Mac: 
 ```sh
 source venv/bin/activate
 ```
+
+Windows:
+```sh
+venv\Scripts\activate
+```
+
 
 Launch the backend server
 

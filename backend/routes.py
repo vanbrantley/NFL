@@ -149,13 +149,14 @@ class PlayerGameLogsResource(Resource):
             if position == "QB":
                 passing_logs = PassingGameLog.query.filter_by(player_id=player_id).all()
                 for log in passing_logs:
-                    player_team_abbreviation = player.team.abbreviation
+                    player_team_id = log.team_id
+                    game_home_team_id = log.game.home_team.team_id
                     game_home_team_abbreviation = log.game.home_team.abbreviation
                     game_away_team_abbreviation = log.game.away_team.abbreviation
 
                     opponent = (
                         game_away_team_abbreviation
-                        if player_team_abbreviation == game_home_team_abbreviation
+                        if player_team_id == game_home_team_id
                         else game_home_team_abbreviation
                     )
 
