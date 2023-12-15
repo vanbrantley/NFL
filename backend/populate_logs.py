@@ -89,8 +89,9 @@ def main():
             )
             if player_full_name is None:
                 error_message = f"No match found for {player_name}"
-                raise ValueError(error_message)
-            # print(player_full_name)
+                # print(error_message)
+                # raise ValueError(error_message)
+                continue
 
             player_id = (
                 home_player_name_to_id[player_full_name]
@@ -140,8 +141,9 @@ def main():
             )
             if player_full_name is None:
                 error_message = f"No match found for {player_name}"
-                raise ValueError(error_message)
-            # print(player_full_name)
+                # print(error_message)
+                # raise ValueError(error_message)
+                continue
 
             player_id = (
                 home_player_name_to_id[player_full_name]
@@ -187,8 +189,9 @@ def main():
             )
             if player_full_name is None:
                 error_message = f"No match found for {player_name}"
-                raise ValueError(error_message)
-            # print(player_full_name)
+                # print(error_message)
+                # raise ValueError(error_message)
+                continue
 
             player_id = (
                 home_player_name_to_id[player_full_name]
@@ -324,6 +327,8 @@ def main():
                     print(
                         f"Failed to retrieve data from {box_score_url}. Status code: {response.status_code}"
                     )
+
+            # print(passing_logs)
 
             db.session.add_all(passing_logs)
             db.session.add_all(rushing_logs)

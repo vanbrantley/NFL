@@ -37,7 +37,8 @@ CREATE TABLE players(
     height INT NOT NULL,
     weight INT NOT NULL,
     experience VARCHAR(2) NOT NULL,
-    college VARCHAR(100) NOT NULL
+    college VARCHAR(100) NOT NULL,
+    active TINYINT(1) NOT NULL
 );
 
 CREATE TABLE games(
@@ -55,6 +56,7 @@ CREATE TABLE passing_game_logs(
     passing_log_id INT AUTO_INCREMENT PRIMARY KEY,
     game_id INT REFERENCES games(game_id),
     player_id INT REFERENCES players(player_id),
+    team_id INT REFERENCES team(team_id),
     completions INT NOT NULL,
     attempts INT NOT NULL,
     yards INT NOT NULL,
@@ -67,6 +69,7 @@ CREATE TABLE rushing_game_logs(
     rushing_log_id INT AUTO_INCREMENT PRIMARY KEY,
     game_id INT REFERENCES games(game_id),
     player_id INT REFERENCES players(player_id),
+    team_id INT REFERENCES team(team_id),
     carries INT NOT NULL,
     yards INT NOT NULL,
     touchdowns INT NOT NULL,
@@ -77,6 +80,7 @@ CREATE TABLE receiving_game_logs(
     receiving_log_id INT AUTO_INCREMENT PRIMARY KEY,
     game_id INT REFERENCES games(game_id),
     player_id INT REFERENCES players(player_id),
+    team_id INT REFERENCES team(team_id),
     targets INT NOT NULL,
     receptions INT NOT NULL,
     yards INT NOT NULL,

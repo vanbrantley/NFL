@@ -104,6 +104,7 @@ try:
                 jersey_number_text = cells[1].text.strip()
                 jersey_number = int(jersey_number_text) if jersey_number_text else None
                 position = cells[2].text.strip()
+                status = cells[3].text.strip()
                 height = cells[4].text.strip()
                 weight = cells[5].text.strip()
                 experience = cells[6].text.strip()
@@ -120,21 +121,27 @@ try:
                 # print("Experience: ", experience)
                 # print("College: ", college)
 
-                player = Player(
-                    player_name=player_name,
-                    team_id=team_id,
-                    team=team_obj,
-                    position=position,
-                    jersey_number=jersey_number,
-                    image_url=image_url,
-                    height=height,
-                    weight=weight,
-                    experience=experience,
-                    college=college,
-                )
+                accepted_positions = ["QB", "RB", "WR", "TE"]
+                accepted_statuses = ["ACT", "RES", "RSR", "RSN"]
 
-                players.append(player)
+                if status in accepted_statuses and position in accepted_positions:
+                    player = Player(
+                        player_name=player_name,
+                        team_id=team_id,
+                        team=team_obj,
+                        position=position,
+                        jersey_number=jersey_number,
+                        image_url=image_url,
+                        height=height,
+                        weight=weight,
+                        experience=experience,
+                        college=college,
+                        active=1,
+                    )
 
+                    players.append(player)
+
+            # print([player.player_name for player in players])
             db.session.add_all(players)
             db.session.commit()  # Commit once after adding all players
             print(f"Successfully added players for Team: {abbreviation} ✅")

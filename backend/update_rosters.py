@@ -1,24 +1,3 @@
-# Overall Flow
-
-# loop through the teams
-
-# scrape the roster from NFL & query your DB roster
-# initialize an empty removed_players, added_players
-# go through the response from the NFL site, finding the names in your DB
-# if name is not found, add it to removed_players
-
-# think you have to be going through both lists of players at the same time
-# if a player is in your DB roster, but not in the NFL roster, they've been removed from the team
-# if a player is not in your DB roster, but is in the NFL roster, they've been added to the team
-# one way to do it would be to do a lookup on the player to see if they exist or not
-
-
-# questions
-
-# should there be overarching removed_players & added_players (& new_players?) dicts that store player's name & team
-# use those two to handle matches, retires, new guys
-# think for the case of new guys, you want to store all of the player's info in added_players so you don't have to go back to get it if they don't have a previous team?
-
 from app import app, db
 from models import Team, Player
 import requests
@@ -27,12 +6,43 @@ from bs4 import BeautifulSoup
 app.app_context().push()
 
 
+def update_player_name_if_match(player, db_team_players):
+    potential_matches = []
+
+    # find potential matches based on last name
+    player_last_name = player.player_name.split(" ")[-1]
+    for db_team_player in db_team_players:
+        db_team_player_last_name = db_team_player.player_name.split(" ")[-1]
+        if db_team_player_last_name == player_last_name:
+            potential_matches.append(db_team_player)
+
+    print("Potential matches: ")
+    print(potential_matches)
+    # go through matches, comparing other fields
+    for potential_match in potential_matches:
+        if (
+            potential_match.position == player.position
+            and potential_match.jersey_number == player.jersey_number
+            # and potential_match.height == player.height
+            # and potential_match.weight == player.weight
+            and potential_match.college == player.college
+        ):
+            print("Potential match name: " + potential_match.player_name)
+            print("Departed player name: " + player.player_name)
+            # if they match, update player's name & add to name_change_players
+            potential_match.player_name = player.player_name
+            print("new name set!!")
+            return potential_match
+
+    return None
+
+
 try:
     nfl_teams = {
         # "buffalo-bills": "BUF",
         # "miami-dolphins": "MIA",
         # "new-england-patriots": "NE",
-        # "new-york-jets": "NYJ",
+        "new-york-jets": "NYJ",
         # "baltimore-ravens": "BAL",
         # "cincinnati-bengals": "CIN",
         # "cleveland-browns": "CLE",
@@ -48,7 +58,7 @@ try:
         # "dallas-cowboys": "DAL",
         # "new-york-giants": "NYG",
         # "philadelphia-eagles": "PHI",
-        "washington-commanders": "WAS",
+        # "washington-commanders": "WAS",
         # "chicago-bears": "CHI",
         # "detroit-lions": "DET",
         # "green-bay-packers": "GB",
@@ -60,7 +70,7 @@ try:
         # "arizona-cardinals": "ARI",
         # "los-angeles-rams": "LAR",
         # "san-francisco-49ers": "SF",
-        "seattle-seahawks": "SEA",
+        # "seattle-seahawks": "SEA",
     }
 
     html_classes = {
@@ -68,10 +78,10 @@ try:
         "player_name": "nfl-o-roster__player-name",
     }
 
-    players_to_add = []
-    players_to_update = []
+    players_new_to_db = []
+    players_with_updated_names = []
+    players_with_new_teams = []
     departed_players = []
-    inactive_players = []
 
     # loop through team dictionary items
     for team, abbreviation in nfl_teams.items():
@@ -143,6 +153,7 @@ try:
                 nfl_roster_names.append(player_name)
 
                 if player_name not in db_roster_names:
+                    # either he's had his name changed or he's new to the team (coming from another team or new to the database entirely)
                     player = Player(
                         player_name=player_name,
                         team_id=team_id,
@@ -160,23 +171,38 @@ try:
                         player_name=player_name
                     ).first()
                     if existing_player is None:
-                        players_to_add.append(player)
+                        # lets handle players with new names here.
+                        # have it return tuple with the player's old name so it can be removed from db_player_names
+                        updated_player = update_player_name_if_match(
+                            player, db_team_players
+                        )
+                        print(player.player_name + " is not in the db")
+                        print(updated_player)
+                        if updated_player is not None:
+                            players_with_updated_names.append(updated_player)
+                        else:
+                            players_new_to_db.append(player)
                     else:
-                        players_to_update.append(player)
+                        players_with_new_teams.append(player)
+
+            print("Db roster names")
+            print(db_roster_names)
+            print("nfl roster names")
+            print(nfl_roster_names)
 
             departed_players_names = list(set(db_roster_names) - set(nfl_roster_names))
+            print(team_obj.full_name + " departed players")
+            print(departed_players_names)
             departed_team_players = [
                 player
                 for player in db_team_players
                 if player.player_name in departed_players_names
             ]
 
-            # check for name changes
-
             if departed_team_players:
                 departed_players.extend(departed_team_players)
-                print("Departed players:")
-                print(departed_players)
+                # print("Departed players:")
+                # print(departed_players)
 
         else:
             print(
@@ -184,20 +210,23 @@ try:
             )
 
     # identify inactive players - players who left one team and did not join another
-    unassigned_players = [
-        player for player in departed_players if player not in players_to_update
+    inactive_players = [
+        player for player in departed_players if player not in players_with_new_teams
     ]
-
-    for player in unassigned_players:
-        inactive_players.append(player)
 
     # todo: fix changed name inactive bug case
 
-    print("Players to add:")
-    print([player.player_name for player in players_to_add])
+    print("Players new to db:")
+    print([player.player_name for player in players_new_to_db])
 
-    print("\nPlayers to update:")
-    print([player.player_name for player in players_to_update])
+    print("\nPlayers with updated names:")
+    print([player.player_name for player in players_with_updated_names])
+
+    print("\nPlayers with new teams:")
+    print([player.player_name for player in players_with_new_teams])
+
+    print("\nDeparted players:")
+    print([player.player_name for player in departed_players])
 
     print("\nInactive players:")
     print([player.player_name for player in inactive_players])

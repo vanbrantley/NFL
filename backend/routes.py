@@ -95,15 +95,7 @@ class TeamRosterResource(Resource):
 
         if team:
             team_players = Player.query.filter_by(team_id=team.team_id).all()
-
-            offensive_positions = ["QB", "RB", "WR", "TE", "K"]
-            offensive_players = [
-                player
-                for player in team_players
-                if player.position in offensive_positions
-            ]
-
-            return offensive_players
+            return team_players
         else:
             api.abort(404, message="Team not found")
 
@@ -443,47 +435,6 @@ class PlayerLogsFilteredResource(Resource):
                     }
                 )
 
-        elif position == "WR":
-            joined_table = (
-                db.session.query(
-                    Player.player_id,
-                    Player.player_name,
-                    Player.image_url,
-                    func.sum(ReceivingGameLog.targets).label("total_targets"),
-                    func.sum(ReceivingGameLog.receptions).label("total_receptions"),
-                    func.sum(ReceivingGameLog.yards).label("total_yards"),
-                    func.sum(ReceivingGameLog.touchdowns).label("total_touchdowns"),
-                    func.sum(ReceivingGameLog.fantasy_points).label(
-                        "total_fantasy_points"
-                    ),
-                )
-                .join(ReceivingGameLog, Player.player_id == ReceivingGameLog.player_id)
-                .join(Game, ReceivingGameLog.game_id == Game.game_id)
-                .filter(
-                    Game.week >= start_week,
-                    Game.week <= end_week,
-                    Player.position != "QB",
-                    Player.position != "RB",
-                )
-                .group_by(Player.player_id)
-                .order_by(order_by_clause)
-                .all()
-            )
-
-            for row in joined_table:
-                results.append(
-                    {
-                        "player_id": row.player_id,
-                        "player_name": row.player_name,
-                        "image_url": row.image_url,
-                        "total_targets": row.total_targets,
-                        "total_receptions": row.total_receptions,
-                        "total_yards": row.total_yards,
-                        "total_touchdowns": row.total_touchdowns,
-                        "total_fantasy_points": row.total_fantasy_points,
-                    }
-                )
-
         elif position == "RB":
             joined_table = (
                 db.session.query(
@@ -517,6 +468,88 @@ class PlayerLogsFilteredResource(Resource):
                         "player_name": row.player_name,
                         "image_url": row.image_url,
                         "total_carries": row.total_carries,
+                        "total_yards": row.total_yards,
+                        "total_touchdowns": row.total_touchdowns,
+                        "total_fantasy_points": row.total_fantasy_points,
+                    }
+                )
+
+        elif position == "WR":
+            joined_table = (
+                db.session.query(
+                    Player.player_id,
+                    Player.player_name,
+                    Player.image_url,
+                    func.sum(ReceivingGameLog.targets).label("total_targets"),
+                    func.sum(ReceivingGameLog.receptions).label("total_receptions"),
+                    func.sum(ReceivingGameLog.yards).label("total_yards"),
+                    func.sum(ReceivingGameLog.touchdowns).label("total_touchdowns"),
+                    func.sum(ReceivingGameLog.fantasy_points).label(
+                        "total_fantasy_points"
+                    ),
+                )
+                .join(ReceivingGameLog, Player.player_id == ReceivingGameLog.player_id)
+                .join(Game, ReceivingGameLog.game_id == Game.game_id)
+                .filter(
+                    Game.week >= start_week,
+                    Game.week <= end_week,
+                    Player.position != "QB",
+                    Player.position != "RB",
+                    Player.position != "TE",
+                )
+                .group_by(Player.player_id)
+                .order_by(order_by_clause)
+                .all()
+            )
+
+            for row in joined_table:
+                results.append(
+                    {
+                        "player_id": row.player_id,
+                        "player_name": row.player_name,
+                        "image_url": row.image_url,
+                        "total_targets": row.total_targets,
+                        "total_receptions": row.total_receptions,
+                        "total_yards": row.total_yards,
+                        "total_touchdowns": row.total_touchdowns,
+                        "total_fantasy_points": row.total_fantasy_points,
+                    }
+                )
+
+        elif position == "TE":
+            joined_table = (
+                db.session.query(
+                    Player.player_id,
+                    Player.player_name,
+                    Player.image_url,
+                    func.sum(ReceivingGameLog.targets).label("total_targets"),
+                    func.sum(ReceivingGameLog.receptions).label("total_receptions"),
+                    func.sum(ReceivingGameLog.yards).label("total_yards"),
+                    func.sum(ReceivingGameLog.touchdowns).label("total_touchdowns"),
+                    func.sum(ReceivingGameLog.fantasy_points).label(
+                        "total_fantasy_points"
+                    ),
+                )
+                .join(ReceivingGameLog, Player.player_id == ReceivingGameLog.player_id)
+                .join(Game, ReceivingGameLog.game_id == Game.game_id)
+                .filter(
+                    Game.week >= start_week,
+                    Game.week <= end_week,
+                    Player.position == "TE",
+                )
+                .group_by(Player.player_id)
+                .order_by(order_by_clause)
+                .all()
+            )
+
+            for row in joined_table:
+                results.append(
+                    {
+                        "player_id": row.player_id,
+                        "player_name": row.player_name,
+                        "image_url": row.image_url,
+                        "total_targets": row.total_targets,
+                        "total_receptions": row.total_receptions,
                         "total_yards": row.total_yards,
                         "total_touchdowns": row.total_touchdowns,
                         "total_fantasy_points": row.total_fantasy_points,
