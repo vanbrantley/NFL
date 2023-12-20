@@ -18,7 +18,7 @@ const FilteredLogsManipulator = () => {
     const fetchData = async () => {
       try {
         const response = await getFilteredLogs(position, startWeek, endWeek, sortBy, isAscending);
-        console.log(response);
+        // console.log(response);
         setData(response);
       } catch (error) {
         // Handle the error, e.g., display an error message
@@ -30,8 +30,9 @@ const FilteredLogsManipulator = () => {
 
   const positionOptions = [
     { value: 'QB', label: 'QB' },
+    { value: 'RB', label: 'RB' },
     { value: 'WR', label: 'WR' },
-    { value: 'RB', label: 'RB' }
+    { value: 'TE', label: 'TE' },
   ];
 
   const startWeekOptions = [
@@ -45,6 +46,10 @@ const FilteredLogsManipulator = () => {
     { value: 8, label: '8' },
     { value: 9, label: '9' },
     { value: 10, label: '10' },
+    { value: 11, label: '11' },
+    { value: 12, label: '12' },
+    { value: 13, label: '13' },
+    { value: 14, label: '14' },
   ];
 
   const endWeekOptions = [
@@ -58,6 +63,10 @@ const FilteredLogsManipulator = () => {
     { value: 8, label: '8' },
     { value: 9, label: '9' },
     { value: 10, label: '10' },
+    { value: 11, label: '11' },
+    { value: 12, label: '12' },
+    { value: 13, label: '13' },
+    { value: 14, label: '14' },
   ];
 
   const handlePositionSelect = (e) => {
@@ -124,7 +133,7 @@ const FilteredLogsManipulator = () => {
         <div>
           {(position == "QB") && <PassingFilteredLogsTable data={data} renderHeader={renderHeader} />}
           {(position == "RB") && <RushingFilteredLogsTable data={data} renderHeader={renderHeader} />}
-          {(position == "WR") && <ReceivingFilteredLogsTable data={data} renderHeader={renderHeader} />}
+          {(position == "WR" || position == "TE") && <ReceivingFilteredLogsTable data={data} renderHeader={renderHeader} />}
         </div>
       ) : (
         <p>Loading...</p>
