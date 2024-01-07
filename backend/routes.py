@@ -392,10 +392,16 @@ class GamesLogsResource(Resource):
             "home_team_details": {
                 "team_abbreviation": game.home_team.abbreviation,
                 "team_full_name": game.home_team.full_name,
+                "team_primary_color": game.home_team.primary_color,
+                "team_secondary_color": game.home_team.secondary_color,
+                "team_tertiary_color": game.home_team.tertiary_color,
             },
             "away_team_details": {
                 "team_abbreviation": game.away_team.abbreviation,
                 "team_full_name": game.away_team.full_name,
+                "team_primary_color": game.away_team.primary_color,
+                "team_secondary_color": game.away_team.secondary_color,
+                "team_tertiary_color": game.away_team.tertiary_color,
             },
             "home_passing": home_passing,
             "away_passing": away_passing,
