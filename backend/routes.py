@@ -307,6 +307,9 @@ class GamesResource(Resource):
 class GamesLogsResource(Resource):
     def get(self, game_id):
         game = Game.query.filter_by(game_id=game_id).first()
+        home_team_id = game.home_team_id
+        away_team_id = game.away_team_id
+
         passing_logs = game.passing_game_logs
         rushing_logs = game.rushing_game_logs
         receiving_logs = game.receiving_game_logs
@@ -366,10 +369,40 @@ class GamesLogsResource(Resource):
                 }
             )
 
+        home_passing = [
+            entry for entry in passing_logs_list if entry["team_id"] == home_team_id
+        ]
+        away_passing = [
+            entry for entry in passing_logs_list if entry["team_id"] == away_team_id
+        ]
+        home_rushing = [
+            entry for entry in rushing_logs_list if entry["team_id"] == home_team_id
+        ]
+        away_rushing = [
+            entry for entry in rushing_logs_list if entry["team_id"] == away_team_id
+        ]
+        home_receiving = [
+            entry for entry in receiving_logs_list if entry["team_id"] == home_team_id
+        ]
+        away_receiving = [
+            entry for entry in receiving_logs_list if entry["team_id"] == away_team_id
+        ]
+
         results = {
-            "passing": passing_logs_list,
-            "rushing": rushing_logs_list,
-            "receiving": receiving_logs_list,
+            "home_team_details": {
+                "team_abbreviation": game.home_team.abbreviation,
+                "team_full_name": game.home_team.full_name,
+            },
+            "away_team_details": {
+                "team_abbreviation": game.away_team.abbreviation,
+                "team_full_name": game.away_team.full_name,
+            },
+            "home_passing": home_passing,
+            "away_passing": away_passing,
+            "home_rushing": home_rushing,
+            "away_rushing": away_rushing,
+            "home_receiving": home_receiving,
+            "away_receiving": away_receiving,
         }
 
         return jsonify(results)
