@@ -1,15 +1,21 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { getGameById } from "../api/api";
-
-
+import 'chart.js/auto';
+import { Pie } from "react-chartjs-2";
 
 const GameDetails = () => {
     const router = useRouter();
     const { game_id } = router.query;
   
     const [data, setData] = useState(null);
-  
+    const [homeRushingData, setHomeRushingData] = useState(null);
+    const [homeReceivingData, setHomeReceivingData] = useState(null);
+    const [homePassingData, setHomePassingData] = useState(null);
+    const [awayRushingData, setAwayRushingData] = useState(null);
+    const [awayReceivingData, setAwayReceivingData] = useState(null);
+    const [awayPassingData, setAwayPassingData] = useState(null);
+
     useEffect(() => {
       if (game_id) {
         console.log(game_id);
@@ -25,7 +31,82 @@ const GameDetails = () => {
   
         fetchData();
       }
-    }, [game_id]);  
+    }, [game_id]);
+
+    useEffect(() => {
+
+      if (data) {
+
+        const homeTeamColors = [data.home_team_details.team_primary_color, data.home_team_details.team_secondary_color];
+        if (data.home_team_details.team_tertiary_color !== null) {
+          homeTeamColors.push(data.home_team_details.team_tertiary_color);
+        }
+
+        const awayTeamColors = [data.away_team_details.team_primary_color, data.away_team_details.team_secondary_color];
+        if (data.away_team_details.team_tertiary_color !== null) {
+          awayTeamColors.push(data.away_team_details.team_tertiary_color);
+        }
+
+        // filter data by team and position
+        const homeRushingData = {
+          // labels: ['Red', 'Blue', 'Yellow'],
+          labels: data.home_rushing.map((entry) => entry.player_name),
+          datasets: [{
+            data: data.home_rushing.map((entry) => entry.carries),
+            backgroundColor: homeTeamColors,
+          }],
+        };
+        setHomeRushingData(homeRushingData);
+
+        const homeReceivingData ={
+          labels: data.home_receiving.map((entry) => entry.player_name),
+          datasets: [{
+            data: data.home_receiving.map((entry) => entry.receptions),
+            backgroundColor: homeTeamColors,
+          }],
+        };
+        setHomeReceivingData(homeReceivingData);
+
+        const homePassingData = {
+          labels: data.home_passing.map((entry) => entry.player_name),
+          datasets: [{
+            data: data.home_passing.map((entry) => entry.yards),
+            backgroundColor: homeTeamColors,
+          }],
+        };
+        setHomePassingData(homePassingData);
+
+        const awayRushingData = {
+          // labels: ['Red', 'Blue', 'Yellow'],
+          labels: data.away_rushing.map((entry) => entry.player_name),
+          datasets: [{
+            data: data.away_rushing.map((entry) => entry.carries),
+            backgroundColor: awayTeamColors,
+          }],
+        };
+        setAwayRushingData(awayRushingData);
+
+        const awayReceivingData ={
+          labels: data.away_receiving.map((entry) => entry.player_name),
+          datasets: [{
+            data: data.away_receiving.map((entry) => entry.receptions),
+            backgroundColor: awayTeamColors,
+          }],
+        };
+        setAwayReceivingData(awayReceivingData);
+
+        const awayPassingData = {
+          labels: data.away_passing.map((entry) => entry.player_name),
+          datasets: [{
+            data: data.away_passing.map((entry) => entry.yards),
+            backgroundColor: awayTeamColors,
+          }],
+        };
+        setAwayPassingData(awayPassingData);
+
+      }
+
+    }, [data]);
 
     const categorizeLogsByTeam = (logs) => {
       const categorizedLogs = {};
@@ -39,65 +120,147 @@ const GameDetails = () => {
       return categorizedLogs;
     };
 
+    const pieData = {
+      labels: ['Red', 'Blue', 'Yellow'],
+      datasets: [{
+        data: [10, 20, 30],
+        backgroundColor: ['red', 'blue', 'yellow'],
+      }],
+    };
+
+    // const homeRushingData = {
+    //   // labels: ['Red', 'Blue', 'Yellow'],
+    //   labels: ,
+    //   datasets: [{
+    //     data: [10, 20, 30],
+    //     backgroundColor: ['red', 'blue', 'yellow'],
+    //   }],
+    // };
+  
     return (
-        <div>
-            {data ? (
+<div>
 
-              <div>
-                {/* const passingLogsByTeam = categorizeLogsByTeam(data.passing);
-                const categorizeLogsByTeam(data.receiving) = categorizeLogsByTeam(data.receiving);
-                const categorizeLogsByTeam(data.rushing) = categorizeLogsByTeam(data.rushing); */}
-      
-                {/* Display passing logs by team */}
-                <h2>Passing Logs:</h2>
-                {Object.keys(categorizeLogsByTeam(data.passing)).map((teamId) => (
-                  <div key={teamId}>
-                    <h3>Team ID: {teamId}</h3>
-                    {categorizeLogsByTeam(data.passing)[teamId].map((passingLog, index) => (
-                      <div key={index}>
-                        <p>{passingLog.player_name}</p>
-                        {/* Display other passing log details */}
-                      </div>
-                    ))}
-                  </div>
-                ))}
-      
-                {/* Display receiving logs by team */}
-                <br></br>
-                <h2>Receiving Logs:</h2>
-                {Object.keys(categorizeLogsByTeam(data.receiving)).map((teamId) => (
-                  <div key={teamId}>
-                    <h3>Team ID: {teamId}</h3>
-                    {categorizeLogsByTeam(data.receiving)[teamId].map((receivingLog, index) => (
-                      <div key={index}>
-                        <p>{receivingLog.player_name}</p>
-                        {/* Display other receiving log details */}
-                      </div>
-                    ))}
-                  </div>
-                ))}
-      
-                {/* Display rushing logs by team */}
-                <br></br>
-                <h2>Rushing Logs:</h2>
-                {Object.keys(categorizeLogsByTeam(data.rushing)).map((teamId) => (
-                  <div key={teamId} className="bg-gray-100 rounded-lg p-4 m-2 shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-1">
-                    <h3>Team ID: {teamId}</h3>
-                    {categorizeLogsByTeam(data.rushing)[teamId].map((rushingLog, index) => (
-                      <div key={index}>
-                        <p>{rushingLog.player_name}: {rushingLog.carries} carries, {rushingLog.yards} yards </p>
+      {data && (
+        <div className="flex">
 
-                        {/* Display other rushing log details */}
-                      </div>
-                    ))}
-                  </div>
-                ))}
-            </div>  
-            ) : (
-                <p>Loading...</p>
-            )}
+        {/* Home team */}
+        <div className="flex flex-col h-full w-full space-y-16">
+
+          {/* Team info */}
+          <div className="flex flex-col w-full justify-center items-center">
+            <img
+              src={`/images/team-logos/${data.home_team_details.team_abbreviation}.png`}
+              height="30px"
+              width="30px"
+            />
+            <p>{data.home_team_details.team_full_name}</p>
+          </div>
+
+          <div className="flex flex-col items-center justify-center w-full h-96">
+            <h2>Passing</h2>
+            {homePassingData && 
+            <Pie data={homePassingData} 
+            options={{
+              plugins: {
+                legend: {
+                  display: false
+                }
+              }
+            }}
+            />}
+          </div>
+          <div className="flex flex-col items-center justify-center w-full h-96">
+          <h2>Rushing</h2>
+            {homeRushingData && 
+            <Pie data={homeRushingData} 
+            options={{
+              plugins: {
+                legend: {
+                  display: false
+                }
+              }
+            }}
+            />}
+          </div>
+          <div className="flex flex-col items-center justify-center w-full h-96">
+          <h2>Receiving</h2>
+            {homeReceivingData && 
+            <Pie data={homeReceivingData} 
+            options={{
+              plugins: {
+                legend: {
+                  display: false
+                }
+              }
+            }}
+            />}
+          </div>
         </div>
+
+        <div className="flex h-full w-full">
+
+        {/* Away team */}
+        <div className="flex flex-col h-full w-full space-y-16">
+
+          {/* Team info */}
+          <div className="flex flex-col w-full justify-center items-center">
+            <img
+              src={`/images/team-logos/${data.away_team_details.team_abbreviation}.png`}
+              height="30px"
+              width="30px"
+            />
+            <p>{data.away_team_details.team_full_name}</p>
+          </div>
+
+              <div className="flex flex-col items-center justify-center w-full h-96">
+                <h2>Passing</h2>
+                {awayPassingData && 
+                <Pie data={awayPassingData}
+                options={{
+                  plugins: {
+                    legend: {
+                      display: false
+                    }
+                  }
+                }} 
+                />}
+              </div>
+              <div className="flex flex-col items-center justify-center w-full h-96">
+                <h2>Rushing</h2>
+                {awayReceivingData && 
+                <Pie data={awayRushingData}
+                options={{
+                  plugins: {
+                    legend: {
+                      display: false
+                    }
+                  }
+                }} 
+                />}
+              </div>
+              <div className="flex flex-col items-center justify-center w-full h-96">
+                <h2>Receiving</h2>
+                {awayReceivingData && <Pie data={awayReceivingData} 
+                options={{
+                  plugins: {
+                    legend: {
+                      display: false
+                    }
+                  }
+                }}
+                />}
+              </div>
+              </div>
+
+        </div>
+
+      </div>
+      )}
+      
+
+      </div>
     );
+    
 };
 
 export default GameDetails;
