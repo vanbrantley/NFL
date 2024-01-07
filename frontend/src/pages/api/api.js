@@ -42,9 +42,9 @@ export const getPlayerByID = async (id) => {
 
 };
 
-export const getGames = async () => {
+export const getGamesByWeek = async (week) => {
   try {
-    const requestUrl = `api/games`;
+    const requestUrl = `api/games/week/${week}`;
     const response = await api.get(requestUrl);
     // console.log(response);
     return response.data;
@@ -54,6 +54,19 @@ export const getGames = async () => {
   }
 
 };
+
+export const getGameById = async (game_id) => {
+  try{
+    // const requestUrl = `api/games/game/logs/${game_id}`;
+    const requestUrl = `api/games/game/logs/${game_id}`;
+    const response = await api.get(requestUrl);
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
 
 
 export const getGameLogsForPlayer = async (id) => {

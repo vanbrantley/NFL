@@ -46,7 +46,7 @@ const Navbar = () => {
           </li>
 
           <li>
-            <Link href="/games/games" className="text-white hover:text-rose-700">Games</Link>
+            <Link href="/games" className="text-white hover:text-rose-700">Games</Link>
           </li>
 
           {team_abbreviations.map((abbreviation, i) => {
